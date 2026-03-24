@@ -29,6 +29,7 @@
       won:      false,
     };
     render();
+    if (window.MatrixRain) window.MatrixRain.init(PANEL);
   }
 
   function pickRandom () {

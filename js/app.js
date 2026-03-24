@@ -415,6 +415,8 @@
         // Activate Command Puzzle
         if (tool === 'puzzle' && window.PuzzleGame) {
           window.PuzzleGame.init();
+        } else if (window.MatrixRain) {
+          window.MatrixRain.stop();
         }
       });
     });
