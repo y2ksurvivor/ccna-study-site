@@ -26,16 +26,42 @@
     </div>
 
     <nav class="sidebar-nav">
-      <div class="nav-section-label">Tools</div>
+      <div class="nav-section-label">Practice</div>
 
-      <a href="#" class="nav-item active" data-tool="ios-reference">
+      <a href="#" class="nav-item active" data-tool="puzzle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+          <circle cx="7" cy="10" r="1" fill="currentColor"/>
+          <circle cx="12" cy="10" r="1" fill="currentColor"/>
+          <circle cx="17" cy="10" r="1" fill="currentColor"/>
+        </svg>
+        <span>Command Puzzle</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tool="study" data-mode="flashcard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        <span>Flashcards</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tool="study" data-mode="quiz">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Quiz Mode</span>
+      </a>
+
+      <div class="nav-section-label" style="margin-top:24px;">Tools</div>
+
+      <a href="#" class="nav-item" data-tool="ios-reference">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 7h16M4 12h16M4 17h10"/>
         </svg>
         <span>IOS Command Ref</span>
       </a>
 
-      <!-- Placeholder items for future tools -->
       <a href="#" class="nav-item" data-tool="subnet-calc">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -59,33 +85,6 @@
         <span>Topology Notes</span>
         <span class="badge-soon">Soon</span>
       </a>
-
-      <div class="nav-section-label" style="margin-top:24px;">Study</div>
-
-      <a href="#" class="nav-item" data-tool="study" data-mode="flashcard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-        </svg>
-        <span>Flashcards</span>
-      </a>
-
-      <a href="#" class="nav-item" data-tool="study" data-mode="quiz">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <span>Quiz Mode</span>
-      </a>
-
-      <a href="#" class="nav-item" data-tool="puzzle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="3" width="20" height="14" rx="2"/>
-          <path d="M8 21h8M12 17v4"/>
-          <circle cx="7" cy="10" r="1" fill="currentColor"/>
-          <circle cx="12" cy="10" r="1" fill="currentColor"/>
-          <circle cx="17" cy="10" r="1" fill="currentColor"/>
-        </svg>
-        <span>Command Puzzle</span>
-      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -103,7 +102,7 @@
           <path d="M3 6h18M3 12h18M3 18h18"/>
         </svg>
       </button>
-      <h1 class="topbar-title">IOS Command Reference</h1>
+      <h1 class="topbar-title">Command Puzzle</h1>
       <div class="topbar-meta">
         <span class="stat-chip" id="statTotal">— commands</span>
       </div>

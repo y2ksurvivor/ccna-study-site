@@ -419,14 +419,13 @@
       });
     });
 
-    // Set initial panel visibility: ios-reference visible, study hidden
+    // Set initial panel visibility: puzzle visible, all others hidden
     toolPanels.forEach(p => {
-      if (p.id === 'tool-ios-reference') {
-        p.style.display = '';
-      } else {
-        p.style.display = 'none';
-      }
+      p.style.display = p.id === 'tool-puzzle' ? '' : 'none';
     });
+
+    // Init puzzle on load
+    if (window.PuzzleGame) window.PuzzleGame.init();
   }
 
 })();
