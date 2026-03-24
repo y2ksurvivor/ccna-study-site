@@ -426,8 +426,7 @@
       p.style.display = p.id === 'tool-puzzle' ? '' : 'none';
     });
 
-    // Init puzzle on load
-    if (window.PuzzleGame) window.PuzzleGame.init();
+    // Puzzle init is triggered by splash.js after dismiss
   }
 
 })();
