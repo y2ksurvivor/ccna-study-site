@@ -1,15 +1,14 @@
 /* ─────────────────────────────────────────────────────────
-   Command Puzzle — Cisco CLI style
+   Command Puzzle — Fill in the Blank
    ───────────────────────────────────────────────────────── */
 
-/* ── Layout ────────────────────────────────────────────── */
 .pz-container {
-  max-width: 720px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 28px 24px 48px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* ── Header ────────────────────────────────────────────── */
@@ -17,54 +16,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .pz-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-.pz-header-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pz-cat-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-/* ── Scenario Box ──────────────────────────────────────── */
+/* ── Scenario ──────────────────────────────────────────── */
 .pz-scenario {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 16px 18px;
 }
 
 .pz-scenario-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
+  margin-bottom: 8px;
 }
 
 .pz-scenario-text {
@@ -73,139 +47,142 @@
   line-height: 1.6;
 }
 
-.pz-mode-badge {
+/* ── Command Card ──────────────────────────────────────── */
+.pz-command-card {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pz-command-mode {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--green);
+}
+
+.pz-mode-desc {
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.pz-command-display {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  line-height: 1.8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pz-cmd-word {
+  color: var(--text-code);
+}
+
+.pz-cmd-blank {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+  letter-spacing: 3px;
+  font-size: 1rem;
+}
+
+.pz-cmd-word--reveal {
+  color: var(--green);
+  font-weight: 700;
+  background: var(--green-dim);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.pz-command-instruction {
   font-size: 0.78rem;
   color: var(--text-secondary);
 }
 
-.pz-mode-desc {
-  color: var(--text-muted);
-  margin-left: 4px;
-}
-
-.pz-mode-badge code {
+.pz-blank-indicator {
   font-family: var(--font-mono);
-  color: var(--green);
-  background: var(--green-dim);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.78rem;
+  color: var(--accent);
+  letter-spacing: 2px;
 }
 
-/* ── Board (attempt rows) ──────────────────────────────── */
-.pz-board {
+/* ── Attempt History ───────────────────────────────────── */
+.pz-attempts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 10px;
+}
+
+.pz-attempt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
+
+.pz-attempt--correct {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+}
+
+.pz-attempt--wrong {
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+}
+
+.pz-attempt-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.pz-attempt-guess {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+/* ── Input ─────────────────────────────────────────────── */
+.pz-input-area {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.pz-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 36px;
-  align-items: center;
-}
-
-.pz-row--empty {
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-}
-
-/* ── Tokens ────────────────────────────────────────────── */
-.pz-token {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 5px;
-  display: inline-block;
-  transition: background 0.15s, color 0.15s;
-  user-select: none;
-}
-
-.pz-token--green {
-  background: var(--green);
-  color: #0a1a0f;
-}
-
-.pz-token--yellow {
-  background: var(--yellow);
-  color: #1a1400;
-}
-
-.pz-token--gray {
-  background: var(--bg-elevated);
+.pz-input-label {
+  font-size: 0.82rem;
   color: var(--text-secondary);
-  border: 1px solid var(--border-light);
+  font-weight: 500;
 }
 
-.pz-token--empty {
-  background: transparent;
-  color: transparent;
-  border: 1px dashed transparent;
-}
-
-.pz-token--sm {
-  font-size: 0.72rem;
-  padding: 2px 7px;
-}
-
-/* ── Legend ────────────────────────────────────────────── */
-.pz-legend {
+.pz-input-row {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.pz-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-/* ── Terminal Input ────────────────────────────────────── */
-.pz-terminal {
-  background: #0d1117;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.pz-prompt-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-
-.pz-prompt {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  color: var(--green);
-  white-space: nowrap;
-  flex-shrink: 0;
+  gap: 10px;
 }
 
 .pz-input {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  background: transparent;
-  color: var(--text-primary);
-  border: none;
-  outline: none;
   flex: 1;
-  min-width: 120px;
-  caret-color: var(--green);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+  caret-color: var(--accent);
+}
+
+.pz-input:focus {
+  border-color: var(--accent);
 }
 
 .pz-input::placeholder {
@@ -217,54 +194,47 @@
   color: #000;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 6px 16px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.15s;
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.pz-submit:hover {
-  background: var(--accent-hover);
-}
+.pz-submit:hover { background: var(--accent-hover); }
 
 /* ── Hint ──────────────────────────────────────────────── */
 .pz-hint {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  font-size: 0.8rem;
+  gap: 7px;
+  font-size: 0.82rem;
   color: var(--yellow);
   background: var(--yellow-dim);
   border: 1px solid rgba(251, 191, 36, 0.2);
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: 9px 13px;
   opacity: 0;
   max-height: 0;
   overflow: hidden;
-  transition: opacity 0.2s, max-height 0.3s;
+  transition: opacity 0.25s, max-height 0.3s;
+  pointer-events: none;
 }
 
 .pz-hint--visible {
   opacity: 1;
   max-height: 80px;
-}
-
-.pz-hint svg {
-  flex-shrink: 0;
-  margin-top: 1px;
+  pointer-events: auto;
 }
 
 /* ── Result ────────────────────────────────────────────── */
 .pz-result {
   border-radius: var(--radius);
-  padding: 20px 24px;
+  padding: 20px 22px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .pz-result--win {
@@ -273,65 +243,43 @@
 }
 
 .pz-result--lose {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(248, 113, 113, 0.08);
   border: 1px solid var(--red);
 }
 
 .pz-result-msg {
   font-size: 0.95rem;
   color: var(--text-primary);
-  line-height: 1.5;
 }
 
-.pz-answer {
+.pz-result-cmd {
   font-family: var(--font-mono);
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 1rem;
   color: var(--green);
-  background: var(--green-dim);
-  padding: 2px 8px;
-  border-radius: 4px;
+  background: rgba(34, 212, 124, 0.08);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  word-break: break-all;
 }
 
 .pz-new-btn {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-light);
+  align-self: flex-start;
+  background: var(--accent);
+  color: #000;
+  border: none;
   border-radius: var(--radius-sm);
-  padding: 8px 18px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 9px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s;
-  flex-shrink: 0;
+  transition: background 0.15s;
 }
 
-.pz-new-btn:hover {
-  background: var(--bg-card);
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.pz-new-btn:hover { background: var(--accent-hover); }
 
 /* ── Responsive ────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .pz-container {
-    padding: 16px 12px 32px;
-  }
-  .pz-terminal {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .pz-submit {
-    width: 100%;
-    padding: 10px;
-  }
-  .pz-result {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .pz-new-btn {
-    width: 100%;
-    text-align: center;
-  }
+@media (max-width: 560px) {
+  .pz-container { padding: 16px 12px 32px; }
+  .pz-input-row { flex-direction: column; }
+  .pz-submit { width: 100%; padding: 12px; }
 }
