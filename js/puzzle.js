@@ -179,7 +179,8 @@
           <div class="pz-scenario-label">Exam Scenario</div>
           <p class="pz-scenario-text">${esc(puzzle.scenario)}</p>
           <div class="pz-mode-badge">
-            Context: <code>${esc(prompt)}</code>
+            CLI Mode: <code>${esc(prompt)}</code>
+            <span class="pz-mode-desc">${puzzle.mode === 'config' ? '— Global Configuration Mode (entered via <code>configure terminal</code>)' : '— Privileged EXEC Mode (entered via <code>enable</code>)'}</span>
           </div>
         </div>
 

@@ -78,6 +78,11 @@
   color: var(--text-secondary);
 }
 
+.pz-mode-desc {
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
 .pz-mode-badge code {
   font-family: var(--font-mono);
   color: var(--green);
