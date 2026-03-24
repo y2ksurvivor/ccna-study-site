@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/quiz.css" />
   <link rel="stylesheet" href="css/acl.css" />
   <link rel="stylesheet" href="css/subnet.css" />
+  <link rel="stylesheet" href="css/puzzle.css" />
 </head>
 <body>
 
@@ -73,6 +74,17 @@
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
         <span>Quiz Mode</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tool="puzzle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+          <circle cx="7" cy="10" r="1" fill="currentColor"/>
+          <circle cx="12" cy="10" r="1" fill="currentColor"/>
+          <circle cx="17" cy="10" r="1" fill="currentColor"/>
+        </svg>
+        <span>Command Puzzle</span>
       </a>
     </nav>
 
@@ -174,6 +186,11 @@
       <!-- Populated by subnet.js -->
     </section>
 
+    <!-- Tool: Command Puzzle -->
+    <section class="tool-panel" id="tool-puzzle">
+      <!-- Populated by puzzle.js -->
+    </section>
+
   </main>
 
   <!-- ── Command Detail Modal ───────────────────────────── -->
@@ -188,9 +205,11 @@
 
   <script src="js/commands-data.js"></script>
   <script src="js/quiz-data.js"></script>
+  <script src="js/puzzle-data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/quiz.js"></script>
   <script src="js/acl.js"></script>
   <script src="js/subnet.js"></script>
+  <script src="js/puzzle.js"></script>
 </body>
 </html>

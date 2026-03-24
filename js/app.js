@@ -341,6 +341,7 @@
       'study':         'Study Center',
       'acl-builder':   'ACL Builder & Explainer',
       'subnet-calc':   'Subnet Calculator',
+      'puzzle':        'Command Puzzle',
     };
 
     navItems.forEach(item => {
@@ -382,6 +383,8 @@
             topbarMeta.innerHTML = `<span class="stat-chip">Builder &amp; Explainer</span>`;
           } else if (tool === 'subnet-calc') {
             topbarMeta.innerHTML = `<span class="stat-chip">IPv4 Only</span>`;
+          } else if (tool === 'puzzle') {
+            topbarMeta.innerHTML = `<span class="stat-chip">${PUZZLES.length} questions</span>`;
           } else {
             topbarMeta.innerHTML = '';
           }
@@ -407,6 +410,11 @@
         // Activate Subnet Calculator
         if (tool === 'subnet-calc' && window.SubnetCalc) {
           window.SubnetCalc.init();
+        }
+
+        // Activate Command Puzzle
+        if (tool === 'puzzle' && window.PuzzleGame) {
+          window.PuzzleGame.init();
         }
       });
     });
