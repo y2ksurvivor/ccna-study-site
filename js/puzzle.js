@@ -21,15 +21,40 @@
 
   window.PuzzleGame = { init };
 
+  // ── Spawn CSS particles (runs once — CSS animates them forever) ───────────────
+  function spawnParticles () {
+    if (PANEL.querySelector('.pz-particles')) return; // already spawned
+
+    const container = document.createElement('div');
+    container.className = 'pz-particles';
+    PANEL.insertBefore(container, PANEL.firstChild);
+
+    const NODE_LABELS = ['R1','SW1','R2','FW','SW2','ISP','R3','Core','WAN'];
+    const count = 32;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      const isNode = i < 9;
+      p.className = isNode ? 'pz-particle pz-particle--node' : 'pz-particle';
+      p.style.left            = (Math.random() * 100) + '%';
+      p.style.top             = (Math.random() * 100) + '%';
+      p.style.animationDuration  = (12 + Math.random() * 20) + 's';
+      p.style.animationDelay     = -(Math.random() * 20) + 's'; // negative = start mid-cycle
+      p.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+      p.style.setProperty('--dy', (Math.random() * 120 - 60) + 'px');
+      if (isNode) p.textContent = NODE_LABELS[i];
+      container.appendChild(p);
+    }
+  }
+
   // ── Init — shows category picker ─────────────────────────────────────────────
   function init () {
-    // Set up a persistent content wrapper so NetworkBg canvas is never clobbered
+    spawnParticles(); // CSS-animated, never stops
+
     if (!PANEL.querySelector('.pz-content')) {
       const wrapper = document.createElement('div');
       wrapper.className = 'pz-content';
       PANEL.appendChild(wrapper);
     }
-    if (window.NetworkBg) window.NetworkBg.init(PANEL);
     renderCategoryPicker();
   }
 

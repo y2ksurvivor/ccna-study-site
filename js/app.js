@@ -415,8 +415,6 @@
         // Activate Study Site
         if (tool === 'puzzle' && window.PuzzleGame) {
           window.PuzzleGame.init();
-        } else if (window.NetworkBg) {
-          window.NetworkBg.stop();
         }
       });
     });
