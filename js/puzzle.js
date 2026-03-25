@@ -142,7 +142,7 @@
     getContent().innerHTML = `
       <div class="pz-container">
         <div class="pz-header">
-          <h2 class="pz-title">Command Puzzle</h2>
+          <h2 class="pz-title">Commands</h2>
           <span class="stat-chip">${PUZZLES.length} questions</span>
         </div>
         <div class="pz-picker-intro">
@@ -235,7 +235,7 @@
       <div class="pz-container">
 
         <div class="pz-header">
-          <h2 class="pz-title">Command Puzzle</h2>
+          <h2 class="pz-title">Commands</h2>
           <div class="pz-header-meta">
             <span class="pz-section-chip">${esc(sectionLabel)}</span>
             <span class="stat-chip">${remaining} attempt${remaining !== 1 ? 's' : ''} left</span>

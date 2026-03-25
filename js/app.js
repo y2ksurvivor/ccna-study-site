@@ -341,7 +341,7 @@
       'study':         'Study Center',
       'acl-builder':   'ACL Builder',
       'subnet-calc':   'Subnet Calculator',
-      'puzzle':        'Command Puzzle',
+      'puzzle':        'Commands',
       'flackbox':      'Flackbox Deck',
     };
 
