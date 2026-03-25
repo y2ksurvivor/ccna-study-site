@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/acl.css?v=3" />
   <link rel="stylesheet" href="css/subnet.css?v=3" />
   <link rel="stylesheet" href="css/puzzle.css?v=8" />
+  <link rel="stylesheet" href="css/typerace.css?v=1" />
 </head>
 <body>
 
@@ -70,6 +71,14 @@
       </a>
 
       <div class="nav-section-label" style="margin-top:24px;">Practice</div>
+
+      <a href="#" class="nav-item" data-tool="typerace">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v5"/>
+          <circle cx="18" cy="17" r="3"/><circle cx="7" cy="17" r="3"/>
+        </svg>
+        <span>Commands v2</span>
+      </a>
 
       <a href="#" class="nav-item active" data-tool="puzzle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -232,6 +241,11 @@
       <!-- Populated by subnet.js -->
     </section>
 
+    <!-- Tool: Type Race -->
+    <section class="tool-panel" id="tool-typerace">
+      <!-- Populated by typerace.js -->
+    </section>
+
     <!-- Tool: Flackbox Deck -->
     <section class="tool-panel" id="tool-flackbox">
       <!-- Populated by flackbox.js -->
@@ -266,6 +280,7 @@
   <script src="js/network-bg.js?v=3"></script>
   <script src="js/puzzle.js?v=7"></script>
   <script src="js/flackbox.js?v=1"></script>
+  <script src="js/typerace.js?v=1"></script>
   <script src="js/splash.js?v=4"></script>
 </body>
 </html>

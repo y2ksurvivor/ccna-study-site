@@ -343,6 +343,7 @@
       'subnet-calc':   'Subnet Calculator',
       'puzzle':        'Commands',
       'flackbox':      'Flackbox Deck',
+      'typerace':      'Commands v2',
     };
 
     // Per-mode title overrides (take precedence over toolTitles)
@@ -404,6 +405,8 @@
             topbarMeta.innerHTML = `<span class="stat-chip">${PUZZLES.length} questions</span>`;
           } else if (tool === 'flackbox') {
             topbarMeta.innerHTML = `<span class="stat-chip">${FLACKBOX_CARDS.length} cards</span>`;
+          } else if (tool === 'typerace') {
+            topbarMeta.innerHTML = `<span class="stat-chip">Type to race</span>`;
           } else {
             topbarMeta.innerHTML = '';
           }
@@ -439,6 +442,11 @@
         // Activate Flackbox Deck
         if (tool === 'flackbox' && window.FlackboxEngine) {
           window.FlackboxEngine.startMode(mode);
+        }
+
+        // Activate Type Race
+        if (tool === 'typerace' && window.TypeRace) {
+          window.TypeRace.init();
         }
       });
     });
