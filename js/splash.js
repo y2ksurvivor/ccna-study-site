@@ -56,7 +56,7 @@
     splash.classList.add('splash--out');
     setTimeout(() => {
       splash.style.display = 'none';
-      if (window.PuzzleGame) window.PuzzleGame.init();
+      if (window.FlackboxEngine) window.FlackboxEngine.startMode('fb-flashcard');
     }, 900);
   }
 

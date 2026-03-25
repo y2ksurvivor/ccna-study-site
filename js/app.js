@@ -451,12 +451,12 @@
       });
     });
 
-    // Set initial panel visibility: puzzle visible, all others hidden
+    // Set initial panel visibility: flackbox visible, all others hidden
     toolPanels.forEach(p => {
-      p.style.display = p.id === 'tool-puzzle' ? '' : 'none';
+      p.style.display = p.id === 'tool-flackbox' ? '' : 'none';
     });
 
-    // Puzzle init is triggered by splash.js after dismiss
+    // Flackbox init is triggered by splash.js after dismiss
   }
 
   // ── Global background particles (spawned once, CSS runs them forever) ────────
