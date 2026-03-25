@@ -305,7 +305,8 @@
 
     if (!state.startTime) state.startTime = Date.now();
 
-    if (e.key === cmd[state.currentPos] && !state.hasError) {
+    if (e.key === cmd[state.currentPos]) {
+      state.hasError = false;
       state.currentPos++;
 
       if (state.currentPos >= cmd.length) {
