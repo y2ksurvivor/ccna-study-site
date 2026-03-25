@@ -29,7 +29,7 @@
       won:      false,
     };
     render();
-    if (window.MatrixRain) window.MatrixRain.init(PANEL);
+    if (window.NetworkBg) window.NetworkBg.init(PANEL);
   }
 
   function pickRandom () {
