@@ -343,7 +343,7 @@
       'subnet-calc':   'Subnet Calculator',
       'puzzle':        'Commands',
       'flackbox':      'Flackbox Deck',
-      'typerace':      'Command Race',
+      'typerace':      'Command Recall',
     };
 
     // Per-mode title overrides (take precedence over toolTitles)

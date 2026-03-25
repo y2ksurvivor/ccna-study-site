@@ -1,57 +1,29 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  Layer8 — Type Race v2
+//  Layer8 — Command Recall
+//  Show a scenario → user types the IOS command from memory
 // ─────────────────────────────────────────────────────────────────────────────
 
 (function () {
   'use strict';
 
-  const PANEL_ID  = 'tool-typerace';
-  const RACE_SIZE = 8;
+  const PANEL_ID    = 'tool-typerace';
+  const SESSION_SIZE = 10;
 
-  const OPP_DEFS = [
-    { name: 'NoviceNet', wpm: 22, fill: '#e05252' },
-    { name: 'OSPF_Pro',  wpm: 44, fill: '#f5a623' },
-    { name: 'RouteKing', wpm: 63, fill: '#6bcb77' },
-  ];
-
-  // ── State ─────────────────────────────────────────────────
   const state = {
-    puzzles:    [],
-    commands:   [],
+    session:    [],
     currentIdx: 0,
-    currentPos: 0,
-    hasError:      false,
-    awaitingEnter: false,
-    startTime:  null,
-    paused:     false,
-    done:       false,
-    totalErrors:         0,
-    totalCharsCompleted: 0,
-    statsTimer: null,
-    oppTimer:   null,
-    opponents:  [],
-    playerFinishTime: null,
+    answered:   false,
+    correct:    0,
+    incorrect:  0,
+    skips:      0,
+    streak:     0,
+    maxStreak:  0,
+    section:    'all',
   };
-
-  function resetOpponents () {
-    state.opponents = OPP_DEFS.map(o => ({
-      name:       o.name,
-      wpm:        o.wpm,
-      fill:       o.fill,
-      charsTyped: 0,
-      finished:   false,
-      finishTime: null,
-    }));
-  }
 
   // ── Helpers ───────────────────────────────────────────────
   function el (id)  { return document.getElementById(id); }
   function panel () { return el(PANEL_ID); }
-
-  function esc (str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
 
   function shuffle (arr) {
     const a = arr.slice();
@@ -62,502 +34,299 @@
     return a;
   }
 
+  function esc (s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function promptFor (p) {
+    return p.mode === 'config' ? 'Router(config)#' : 'Router#';
+  }
+
+  function getSections () {
+    const seen = new Set();
+    const out  = [];
+    PUZZLES.forEach(p => {
+      if (!seen.has(p.section)) {
+        seen.add(p.section);
+        out.push({ section: p.section, unit: p.unit });
+      }
+    });
+    out.sort((a, b) => a.section - b.section);
+    return out;
+  }
+
   function buildPool () {
-    return PUZZLES.filter(p => {
-      const a = p.answer.trim();
-      return a.length >= 8 && a.length <= 52 &&
-             !a.includes('\n') && !a.includes('<') && !a.includes('[');
-    });
+    return state.section === 'all'
+      ? PUZZLES.slice()
+      : PUZZLES.filter(p => p.section === state.section);
   }
 
-  // ── Math ──────────────────────────────────────────────────
-  function totalRaceChars () {
-    return state.commands.reduce((s, c) => s + c.length, 0);
-  }
-
-  function playerProgress () {
-    const t = totalRaceChars();
-    return t ? ((state.totalCharsCompleted + state.currentPos) / t) * 100 : 0;
-  }
-
-  function oppProgress (opp) {
-    const t = totalRaceChars();
-    return t ? Math.min(100, (opp.charsTyped / t) * 100) : 0;
-  }
-
-  function calcWPM () {
-    if (!state.startTime) return 0;
-    const mins = (Date.now() - state.startTime) / 60000;
-    if (mins < 0.001) return 0;
-    return Math.round(((state.totalCharsCompleted + state.currentPos) / 5) / mins);
-  }
-
-  function calcAccuracy () {
-    const total = state.totalCharsCompleted + state.currentPos + state.totalErrors;
-    return total ? Math.max(0, Math.round(((total - state.totalErrors) / total) * 100)) : 100;
-  }
-
-  function wpmGrade (wpm) {
-    if (wpm >= 80) return 'Network Engineer speed 🚀';
-    if (wpm >= 60) return 'Solid — above average';
-    if (wpm >= 40) return 'Getting there — keep it up';
-    return 'Practice makes perfect';
-  }
-
-  // ── SVGs ──────────────────────────────────────────────────
-  function playerCarSVG () {
-    return `<svg width="48" height="22" viewBox="0 0 48 22">
-      <rect x="4" y="8" width="38" height="9" rx="2.5" fill="var(--accent)"/>
-      <path d="M11 8 L14 3 H32 L37 8 Z" fill="var(--accent)"/>
-      <rect x="15" y="3.5" width="7" height="4" rx="1" fill="rgba(6,8,16,0.55)"/>
-      <rect x="24" y="3.5" width="6" height="4" rx="1" fill="rgba(6,8,16,0.55)"/>
-      <circle cx="13" cy="18" r="3.5" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
-      <circle cx="13" cy="18" r="1.2" fill="var(--accent)" opacity="0.5"/>
-      <circle cx="35" cy="18" r="3.5" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
-      <circle cx="35" cy="18" r="1.2" fill="var(--accent)" opacity="0.5"/>
-      <rect x="41" y="10" width="5" height="3" rx="1" fill="#fff" opacity="0.85"/>
-      <rect x="2"  y="10" width="4" height="3" rx="1" fill="#ff4444" opacity="0.9"/>
-    </svg>`;
-  }
-
-  function oppCarSVG (fill) {
-    return `<svg width="40" height="18" viewBox="0 0 40 18">
-      <rect x="3" y="7" width="32" height="7" rx="2" fill="${fill}" opacity="0.85"/>
-      <path d="M9 7 L12 2 H27 L31 7 Z" fill="${fill}" opacity="0.85"/>
-      <circle cx="11" cy="15" r="3" fill="#0d1017" stroke="${fill}" stroke-width="1.2"/>
-      <circle cx="29" cy="15" r="3" fill="#0d1017" stroke="${fill}" stroke-width="1.2"/>
-      <rect x="34" y="8"  width="4" height="2.5" rx="0.5" fill="#fff" opacity="0.5"/>
-      <rect x="2"  y="8" width="3" height="2.5" rx="0.5" fill="#f00" opacity="0.5"/>
-    </svg>`;
-  }
-
-  // ── Setup ─────────────────────────────────────────────────
+  // ── Setup screen ──────────────────────────────────────────
   function renderSetup () {
+    const sections = getSections();
+    const pool     = buildPool();
+    const size     = Math.min(SESSION_SIZE, pool.length);
+
+    const pills = sections.map(s => {
+      const on = state.section === s.section;
+      return `<button class="topic-pill${on ? ' selected' : ''}" data-sec="${s.section}">${esc(s.unit)}</button>`;
+    }).join('');
+
     panel().innerHTML = `
-      <div class="tr-setup">
-        <div class="tr-setup-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v5"/>
-            <circle cx="18" cy="17" r="3"/><circle cx="7" cy="17" r="3"/>
-          </svg>
-        </div>
-        <h2>Command Race</h2>
-        <p>Race ${OPP_DEFS.length} opponents through ${RACE_SIZE} IOS commands.<br>Each command pauses for a quick explanation.</p>
-        <div class="tr-opp-preview">
-          ${OPP_DEFS.map(o => `
-            <div class="tr-opp-chip">
-              <span class="tr-opp-dot" style="background:${o.fill}"></span>
-              <span>${esc(o.name)}</span>
-              <span class="tr-opp-wpm">~${o.wpm} WPM</span>
-            </div>
-          `).join('')}
-        </div>
-        <button class="tr-btn-start" id="trStartBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          Start Race
-        </button>
-      </div>
-    `;
-    el('trStartBtn').addEventListener('click', startRace);
-  }
-
-  // ── Race ──────────────────────────────────────────────────
-  function startRace () {
-    clearInterval(state.statsTimer);
-    clearInterval(state.oppTimer);
-    resetOpponents();
-    const pool = shuffle(buildPool()).slice(0, RACE_SIZE);
-    Object.assign(state, {
-      puzzles:   pool,
-      commands:  pool.map(p => p.answer.trim()),
-      currentIdx: 0,
-      currentPos: 0,
-      hasError:      false,
-      awaitingEnter: false,
-      startTime:  null,
-      paused:     false,
-      done:       false,
-      totalErrors:         0,
-      totalCharsCompleted: 0,
-      playerFinishTime:    null,
-    });
-    renderRace();
-  }
-
-  function buildLanesHTML () {
-    const pPct = playerProgress();
-    let html = `
-      <div class="tr-lane">
-        <span class="tr-lane-label tr-lane-label--player">You</span>
-        <div class="tr-lane-road" id="trPlayerRoad">
-          <div class="tr-road-anim" id="trRoadAnim"></div>
-          <div class="tr-lane-car" id="trCarPlayer" style="left:${Math.max(3,Math.min(87,pPct))}%">${playerCarSVG()}</div>
-          <div class="tr-lane-flag">🏁</div>
-        </div>
-      </div>
-    `;
-    state.opponents.forEach((opp, i) => {
-      const oPct = oppProgress(opp);
-      html += `
-        <div class="tr-lane">
-          <span class="tr-lane-label" style="color:${opp.fill}">${esc(opp.name)}</span>
-          <div class="tr-lane-road">
-            <div class="tr-lane-car" id="trCarOpp${i}" style="left:${Math.max(3,Math.min(87,oPct))}%">${oppCarSVG(opp.fill)}</div>
-            <div class="tr-lane-flag">🏁</div>
-          </div>
-        </div>
-      `;
-    });
-    return html;
-  }
-
-  function renderRace () {
-    panel().innerHTML = `
-      <div class="tr-race">
-
-        <div class="tr-stats-bar">
-          <div class="tr-stat"><span class="tr-stat-value" id="trWpm">0</span><span class="tr-stat-label">WPM</span></div>
-          <div class="tr-stat"><span class="tr-stat-value" id="trAcc">100%</span><span class="tr-stat-label">Accuracy</span></div>
-          <div class="tr-stat"><span class="tr-stat-value" id="trTime">0:00</span><span class="tr-stat-label">Time</span></div>
-          <div class="tr-stat"><span class="tr-stat-value" id="trErrors">0</span><span class="tr-stat-label">Errors</span></div>
+      <div class="study-setup">
+        <div class="study-setup-header">
+          <h2>Command Recall</h2>
+          <p>Read the scenario. Type the full IOS command from memory and press Enter.</p>
         </div>
 
-        <div class="tr-track-wrap">
-          <div class="tr-track" id="trTrack">${buildLanesHTML()}</div>
-          <div class="tr-track-meta">
-            <span id="trCmdLabel">Command 1 of ${state.commands.length}</span>
-            <span id="trPctLabel">0% complete</span>
+        <div class="setup-section">
+          <div class="setup-section-title">Section</div>
+          <div class="topic-pills">
+            <button class="topic-pill${state.section === 'all' ? ' selected' : ''}" data-sec="all">All Sections</button>
+            ${pills}
           </div>
         </div>
 
-        <div class="tr-command-wrap">
-          <div class="tr-command-label" id="trCmdHeading">Type this command</div>
-          <div class="tr-command-display" id="trCmdDisplay">${buildCmdHTML()}</div>
-          <div class="tr-explain" id="trExplain" style="display:none"></div>
+        <div class="setup-section">
+          <div class="setup-section-title">Session</div>
+          <p class="cr-pool-meta">${pool.length} commands available &nbsp;·&nbsp; ${size} per session</p>
         </div>
 
-        <div class="tr-input-wrap" id="trInputWrap">
-          <input id="trInput" class="tr-input" type="text"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-            placeholder="Start typing…"/>
-          <div class="tr-input-hint">Backspace to correct errors</div>
+        <div class="start-buttons">
+          <button class="btn-start btn-start-flashcard" id="crStart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 3l14 9-14 9V3z"/>
+            </svg>
+            Start Recall
+          </button>
         </div>
+      </div>
+    `;
+
+    panel().querySelectorAll('.topic-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const raw = btn.dataset.sec;
+        state.section = raw === 'all' ? 'all' : parseInt(raw, 10);
+        renderSetup();
+      });
+    });
+
+    el('crStart').addEventListener('click', startSession);
+  }
+
+  // ── Session start ─────────────────────────────────────────
+  function startSession () {
+    const pool = buildPool();
+    if (!pool.length) { alert('No commands in this section.'); return; }
+    state.session    = shuffle(pool).slice(0, SESSION_SIZE);
+    state.currentIdx = 0;
+    state.correct    = 0;
+    state.incorrect  = 0;
+    state.skips      = 0;
+    state.streak     = 0;
+    state.maxStreak  = 0;
+    renderQuestion();
+  }
+
+  // ── Question screen ───────────────────────────────────────
+  function renderQuestion () {
+    if (state.currentIdx >= state.session.length) { renderResults(); return; }
+
+    const puzzle = state.session[state.currentIdx];
+    const idx    = state.currentIdx;
+    const total  = state.session.length;
+    const pct    = Math.round((idx / total) * 100);
+    state.answered = false;
+
+    panel().innerHTML = `
+      <div class="cr-wrap">
+
+        <div class="cr-topbar">
+          <button class="session-back-btn" id="crBack">← Setup</button>
+          <span class="cr-counter">${idx + 1} / ${total}</span>
+          <span class="cr-streak-badge" id="crStreakBadge">${state.streak > 1 ? '🔥 ' + state.streak : ''}</span>
+        </div>
+
+        <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+
+        <div class="cr-scenario-card">
+          <span class="cr-scenario-label">Scenario</span>
+          <p class="cr-scenario-text">${esc(puzzle.scenario)}</p>
+        </div>
+
+        <div class="cr-input-row">
+          <span class="cr-prompt">${esc(promptFor(puzzle))}&nbsp;</span>
+          <input id="crInput" class="cr-input" type="text"
+            autocomplete="off" spellcheck="false"
+            autocorrect="off" autocapitalize="none"
+            placeholder="type command and press Enter…" />
+        </div>
+
+        <div class="cr-action-row">
+          <button class="btn-skip" id="crSkip">Skip</button>
+          <button class="cr-hint-btn" id="crHint">Show Hint</button>
+        </div>
+
+        <div class="cr-feedback" id="crFeedback" style="display:none"></div>
 
       </div>
     `;
 
-    el('trInput').focus();
-    el('trInput').addEventListener('keydown', onKeydown);
+    const input = el('crInput');
+    input.focus();
 
-    state.statsTimer = setInterval(tickStats, 150);
-    state.oppTimer   = setInterval(tickOpponents, 100);
-
-    // Show context for first command before race begins
-    showPreCommandExplanation();
-  }
-
-  // ── Command display ───────────────────────────────────────
-  function promptFor (puzzle) {
-    if (!puzzle) return 'Router#';
-    return puzzle.mode === 'config' ? 'Router(config)#' : 'Router#';
-  }
-
-  function buildCmdHTML () {
-    const cmd    = state.commands[state.currentIdx] || '';
-    const prompt = promptFor(state.puzzles[state.currentIdx]);
-    const promptSpan = `<span class="tr-ch-prompt">${esc(prompt)}\u00a0</span>`;
-    const chars = cmd.split('').map((ch, i) => {
-      const d = ch === ' ' ? '\u00a0' : esc(ch);
-      if (i < state.currentPos)     return `<span class="tr-ch tr-ch-correct">${d}</span>`;
-      if (i === state.currentPos)   return `<span class="tr-ch ${state.hasError ? 'tr-ch-error' : 'tr-ch-cursor'}">${d}</span>`;
-      return `<span class="tr-ch tr-ch-pending">${d}</span>`;
-    }).join('');
-    const enterHint = state.awaitingEnter
-      ? `<span class="tr-enter-hint">↵ Enter</span>` : '';
-    return promptSpan + chars + enterHint;
-  }
-
-  function buildCompletedCmdHTML (puzzle) {
-    const prompt = promptFor(puzzle);
-    const promptSpan = `<span class="tr-ch-prompt">${esc(prompt)}\u00a0</span>`;
-    const chars = puzzle.answer.trim().split('').map(ch => {
-      const d = ch === ' ' ? '\u00a0' : esc(ch);
-      return `<span class="tr-ch tr-ch-correct">${d}</span>`;
-    }).join('');
-    return promptSpan + chars;
-  }
-
-  // ── Keydown ───────────────────────────────────────────────
-  function onKeydown (e) {
-    if (state.done) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'Tab') { e.preventDefault(); return; }
-
-    // Pre-command pause: first printable key resumes AND is processed
-    if (state.paused) {
-      if (e.key.length !== 1) return;
+    input.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
       e.preventDefault();
-      resumeFromPause();
-      // fall through — process this key as the first typed character
-    }
+      if (state.answered) { advance(); return; }
+      const val = input.value.trim();
+      if (!val) return;
+      submit(puzzle, val);
+    });
 
-    // Waiting for Enter to confirm completed command
-    if (state.awaitingEnter) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        state.awaitingEnter = false;
-        commitCommand();
-      }
-      return;
-    }
+    el('crBack').addEventListener('click', renderSetup);
 
-    const cmd = state.commands[state.currentIdx];
-    if (!cmd) return;
+    el('crSkip').addEventListener('click', () => {
+      if (state.answered) return;
+      state.skips++;
+      state.streak = 0;
+      showFeedback(puzzle, null, 'skipped');
+    });
 
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      if (state.hasError) {
-        state.hasError = false;
-      } else if (state.currentPos > 0) {
-        state.currentPos--;
-      }
-      refreshDisplay();
-      return;
-    }
+    el('crHint').addEventListener('click', () => {
+      const btn = el('crHint');
+      btn.textContent = puzzle.hint;
+      btn.classList.add('cr-hint-btn--revealed');
+      btn.disabled = true;
+    });
+  }
 
-    if (e.key.length !== 1) return;
-    e.preventDefault();
-
-    if (!state.startTime) state.startTime = Date.now();
-
-    if (e.key === cmd[state.currentPos]) {
-      state.hasError = false;
-      state.currentPos++;
-
-      if (state.currentPos >= cmd.length) {
-        // All chars correct — wait for Enter
-        state.awaitingEnter = true;
-        refreshDisplay();
-        return;
-      }
+  function submit (puzzle, value) {
+    const isCorrect = value.toLowerCase() === puzzle.answer.toLowerCase();
+    if (isCorrect) {
+      state.correct++;
+      state.streak++;
+      if (state.streak > state.maxStreak) state.maxStreak = state.streak;
     } else {
-      if (!state.hasError) {
-        state.totalErrors++;
-        state.hasError = true;
-      }
+      state.incorrect++;
+      state.streak = 0;
     }
-
-    refreshDisplay();
+    showFeedback(puzzle, value, isCorrect ? 'correct' : 'incorrect');
   }
 
-  // ── Commit completed command ──────────────────────────────
-  function commitCommand () {
-    const justFinishedIdx = state.currentIdx;
-    state.totalCharsCompleted += state.commands[justFinishedIdx].length;
+  function showFeedback (puzzle, typed, result) {
+    state.answered = true;
+
+    const input = el('crInput');
+    if (input) input.disabled = true;
+
+    const skipBtn = el('crSkip');
+    const hintBtn = el('crHint');
+    if (skipBtn) skipBtn.disabled = true;
+    if (hintBtn) hintBtn.disabled = true;
+
+    const badge = el('crStreakBadge');
+    if (badge) badge.textContent = state.streak > 1 ? '🔥 ' + state.streak : '';
+
+    const fb = el('crFeedback');
+    fb.style.display = '';
+
+    if (result === 'correct') {
+      fb.className = 'cr-feedback cr-feedback--correct';
+      fb.innerHTML = `
+        <div class="cr-fb-left">
+          <span class="cr-fb-icon">✓</span>
+          <div>
+            <div class="cr-fb-status">Correct!</div>
+            <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
+          </div>
+        </div>
+        <button class="btn-next" id="crNext">${state.currentIdx + 1 < state.session.length ? 'Next →' : 'Results →'}</button>
+      `;
+    } else if (result === 'incorrect') {
+      fb.className = 'cr-feedback cr-feedback--incorrect';
+      fb.innerHTML = `
+        <div class="cr-fb-left">
+          <span class="cr-fb-icon">✗</span>
+          <div>
+            <div class="cr-fb-status">Correct answer:</div>
+            <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
+          </div>
+        </div>
+        <button class="btn-next" id="crNext">${state.currentIdx + 1 < state.session.length ? 'Next →' : 'Results →'}</button>
+      `;
+    } else {
+      fb.className = 'cr-feedback cr-feedback--skipped';
+      fb.innerHTML = `
+        <div class="cr-fb-left">
+          <span class="cr-fb-icon">→</span>
+          <div>
+            <div class="cr-fb-status">Answer:</div>
+            <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
+          </div>
+        </div>
+        <button class="btn-next" id="crNext">${state.currentIdx + 1 < state.session.length ? 'Next →' : 'Results →'}</button>
+      `;
+    }
+
+    el('crNext').addEventListener('click', advance);
+  }
+
+  function advance () {
     state.currentIdx++;
-    state.currentPos = 0;
-    state.hasError   = false;
-
-    refreshDisplay();
-
-    if (state.currentIdx >= state.commands.length) {
-      state.playerFinishTime = Date.now() - state.startTime;
-      clearInterval(state.statsTimer);
-      clearInterval(state.oppTimer);
-      setTimeout(finishRace, 300);
-    } else {
-      showPreCommandExplanation();
-    }
-  }
-
-  // ── Pre-command explanation pause ────────────────────────
-  function showPreCommandExplanation () {
-    state.paused = true;
-
-    const puzzle  = state.puzzles[state.currentIdx];
-    const heading = el('trCmdHeading');
-    const display = el('trCmdDisplay');
-    const explain = el('trExplain');
-    const label   = el('trCmdLabel');
-
-    if (heading) heading.textContent = 'Get ready…';
-    if (label)   label.textContent = `Command ${state.currentIdx + 1} of ${state.commands.length}`;
-
-    // Show command in full-pending state so user can see what's coming
-    if (display) display.innerHTML = buildCmdHTML();
-
-    if (explain) {
-      explain.style.display = 'block';
-      explain.innerHTML = `
-        <div class="tr-explain-inner">
-          <div class="tr-explain-context">${esc(puzzle.scenario)}</div>
-          <div class="tr-explain-meta">
-            <span class="tr-explain-unit">${esc(puzzle.unit)}</span>
-            <span class="tr-explain-mode">${puzzle.mode === 'config' ? 'config mode' : 'exec mode'}</span>
-          </div>
-          <div class="tr-explain-start-hint">Start typing to race…</div>
-        </div>
-      `;
-    }
-
-    const input = el('trInput');
-    if (input) { input.value = ''; input.focus(); }
-  }
-
-  function resumeFromPause () {
-    state.paused = false;
-
-    const heading = el('trCmdHeading');
-    const explain = el('trExplain');
-
-    if (heading) heading.textContent = 'Type this command';
-    if (explain) explain.style.display = 'none';
-  }
-
-  // ── Refresh display ───────────────────────────────────────
-  function refreshDisplay () {
-    const display = el('trCmdDisplay');
-    if (display && !state.paused) display.innerHTML = buildCmdHTML();
-
-    const pPct = playerProgress();
-    const car  = el('trCarPlayer');
-    if (car) car.style.left = Math.max(3, Math.min(87, pPct)) + '%';
-
-    const pctLbl = el('trPctLabel');
-    if (pctLbl) pctLbl.textContent = Math.round(pPct) + '% complete';
-
-    // Road scroll speed proportional to WPM
-    const road = el('trRoadAnim');
-    if (road) {
-      const wpm   = calcWPM();
-      const speed = Math.max(0.1, 0.75 - wpm * 0.005);
-      road.style.animationDuration = speed + 's';
-    }
-
-    const input = el('trInput');
-    if (input) input.classList.toggle('tr-input--error', state.hasError);
-
-    tickStats();
-  }
-
-  // ── Tickers ───────────────────────────────────────────────
-  function tickStats () {
-    const wpmEl  = el('trWpm');
-    const accEl  = el('trAcc');
-    const timeEl = el('trTime');
-    const errEl  = el('trErrors');
-    if (wpmEl)  wpmEl.textContent  = calcWPM();
-    if (accEl)  accEl.textContent  = calcAccuracy() + '%';
-    if (errEl)  errEl.textContent  = state.totalErrors;
-    if (timeEl && state.startTime) {
-      const sec = Math.floor((Date.now() - state.startTime) / 1000);
-      timeEl.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
-    }
-  }
-
-  function tickOpponents () {
-    if (state.paused || state.done) return;
-    const total = totalRaceChars();
-    if (!total || !state.startTime) return;
-
-    const dt = 0.1; // seconds per tick
-
-    state.opponents.forEach((opp, i) => {
-      if (opp.finished) return;
-      const charsPerSec = (opp.wpm * 5) / 60;
-      opp.charsTyped = Math.min(total, opp.charsTyped + charsPerSec * dt);
-      if (opp.charsTyped >= total) {
-        opp.charsTyped  = total;
-        opp.finished    = true;
-        opp.finishTime  = Date.now() - state.startTime;
-      }
-      const oPct = oppProgress(opp);
-      const carEl = el('trCarOpp' + i);
-      if (carEl) carEl.style.left = Math.max(3, Math.min(87, oPct)) + '%';
-    });
+    renderQuestion();
   }
 
   // ── Results ───────────────────────────────────────────────
-  function finishRace () {
-    state.done = true;
-    clearInterval(state.statsTimer);
-    clearInterval(state.oppTimer);
-
-    const wpm = calcWPM();
-    const acc = calcAccuracy();
-    const playerMs = state.playerFinishTime || 0;
-    const playerSec = playerMs / 1000;
-
-    // Rank all finishers
-    const entries = [
-      { name: 'You', ms: playerMs, wpm, isPlayer: true },
-      ...state.opponents.map(o => ({
-        name: o.name,
-        ms:   o.finishTime || (totalRaceChars() / ((o.wpm * 5) / 60) * 1000),
-        wpm:  o.wpm,
-        fill: o.fill,
-        isPlayer: false,
-      })),
-    ].sort((a, b) => a.ms - b.ms);
-
-    const playerPlace = entries.findIndex(e => e.isPlayer) + 1;
-    const placeLabel  = ['🥇 1st', '🥈 2nd', '🥉 3rd', '4th'][playerPlace - 1] || `${playerPlace}th`;
-    const mins = Math.floor(playerSec / 60);
-    const secs = Math.floor(playerSec % 60);
+  function renderResults () {
+    const total = state.session.length;
+    const pct   = total > 0 ? Math.round((state.correct / total) * 100) : 0;
+    const grade = pct >= 90 ? '🏆' : pct >= 70 ? '🎯' : pct >= 50 ? '📈' : '📚';
 
     panel().innerHTML = `
       <div class="tr-results">
         <div class="tr-results-header">
-          <div class="tr-trophy">${playerPlace === 1 ? '🏆' : playerPlace === 2 ? '🥈' : playerPlace === 3 ? '🥉' : '🏁'}</div>
-          <h2>Race Complete — ${placeLabel}!</h2>
+          <div class="tr-trophy">${grade}</div>
+          <h2>${pct}% Accuracy</h2>
+          <p style="color:var(--text-secondary);margin:0">${state.correct} of ${total} correct</p>
         </div>
 
         <div class="tr-result-grid">
           <div class="tr-result-stat">
-            <span class="tr-result-value">${wpm}</span>
-            <span class="tr-result-label">WPM</span>
+            <span class="tr-result-value" style="color:#4ade80">${state.correct}</span>
+            <span class="tr-result-label">Correct</span>
           </div>
           <div class="tr-result-stat">
-            <span class="tr-result-value">${acc}%</span>
-            <span class="tr-result-label">Accuracy</span>
+            <span class="tr-result-value" style="color:#e05252">${state.incorrect}</span>
+            <span class="tr-result-label">Incorrect</span>
           </div>
           <div class="tr-result-stat">
-            <span class="tr-result-value">${mins}:${String(secs).padStart(2,'0')}</span>
-            <span class="tr-result-label">Time</span>
+            <span class="tr-result-value" style="color:var(--text-muted)">${state.skips}</span>
+            <span class="tr-result-label">Skipped</span>
           </div>
           <div class="tr-result-stat">
-            <span class="tr-result-value">${state.totalErrors}</span>
-            <span class="tr-result-label">Errors</span>
+            <span class="tr-result-value">${state.maxStreak}</span>
+            <span class="tr-result-label">Best Streak</span>
           </div>
         </div>
 
-        <div class="tr-standings">
-          <div class="tr-standings-title">Final Standings</div>
-          ${entries.map((e, i) => {
-            const t = Math.floor(e.ms / 1000);
-            const tm = Math.floor(t / 60) + ':' + String(t % 60).padStart(2,'0');
-            const medal = ['🥇','🥈','🥉',''][i] || '';
-            return `
-              <div class="tr-standing-row ${e.isPlayer ? 'tr-standing-row--player' : ''}">
-                <span class="tr-standing-place">${medal} ${i + 1}</span>
-                <span class="tr-standing-name" ${e.fill ? `style="color:${e.fill}"` : ''}>${esc(e.name)}</span>
-                <span class="tr-standing-time">${tm}</span>
-                <span class="tr-standing-wpm">${e.wpm} WPM</span>
-              </div>
-            `;
-          }).join('')}
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+          <button class="tr-btn-start" id="crAgain">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M1 4v6h6M23 20v-6h-6"/>
+              <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+            </svg>
+            Play Again
+          </button>
+          <button class="btn-skip" id="crSetup" style="padding:12px 24px;">← Setup</button>
         </div>
-
-        <div class="tr-wpm-grade">${wpmGrade(wpm)}</div>
-
-        <button class="tr-btn-start" id="trNewRace">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          Race Again
-        </button>
       </div>
     `;
 
-    el('trNewRace').addEventListener('click', startRace);
+    el('crAgain').addEventListener('click', startSession);
+    el('crSetup').addEventListener('click', renderSetup);
   }
 
   // ── Public API ────────────────────────────────────────────
