@@ -337,11 +337,20 @@
     const topbarMeta  = document.querySelector('.topbar-meta');
 
     const toolTitles = {
-      'ios-reference': 'IOS Command Reference',
+      'ios-reference': 'IOS Command Ref',
       'study':         'Study Center',
-      'acl-builder':   'ACL Builder & Explainer',
+      'acl-builder':   'ACL Builder',
       'subnet-calc':   'Subnet Calculator',
-      'puzzle':        'Study Site',
+      'puzzle':        'Command Puzzle',
+    };
+
+    // Per-mode title overrides (take precedence over toolTitles)
+    const modeTitles = {
+      'flashcard':  'Flashcards',
+      'quiz':       'Quiz Mode',
+      'drill':      'Octet Drill',
+      'tnlogic':    '2\u207F Logic',
+      'divmethod':  'Division Method',
     };
 
     navItems.forEach(item => {
@@ -373,14 +382,10 @@
           }
         });
 
-        // Update topbar title
-        const modeTitleMap = { 'drill': 'Octet Drill', 'tnlogic': '2\u207F Logic', 'divmethod': 'Division Method' };
-        const titleKey = tool;
-        const toolTitlesExt = Object.assign({}, toolTitles);
-        if (tool === 'subnet-calc' && mode && modeTitleMap[mode]) {
-          toolTitlesExt['subnet-calc'] = modeTitleMap[mode];
+        // Update topbar title — mode-specific title takes precedence
+        if (topbarTitle) {
+          topbarTitle.textContent = (mode && modeTitles[mode]) || toolTitles[tool] || tool;
         }
-        if (topbarTitle) topbarTitle.textContent = toolTitlesExt[titleKey] || toolTitles[tool] || tool;
 
         // Update topbar meta
         if (topbarMeta) {
