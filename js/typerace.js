@@ -140,7 +140,7 @@
             <circle cx="18" cy="17" r="3"/><circle cx="7" cy="17" r="3"/>
           </svg>
         </div>
-        <h2>Commands v2</h2>
+        <h2>Command Race</h2>
         <p>Race ${OPP_DEFS.length} opponents through ${RACE_SIZE} IOS commands.<br>Each command pauses for a quick explanation.</p>
         <div class="tr-opp-preview">
           ${OPP_DEFS.map(o => `
