@@ -287,6 +287,7 @@
     }
 
     el('crNext').addEventListener('click', advance);
+    el('crNext').focus();
   }
 
   function advance () {
