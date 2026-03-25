@@ -352,11 +352,14 @@
         const tool = item.dataset.tool;
         const mode = item.dataset.mode || null;
 
-        // Update active nav item
+        // Update active nav item — match on tool + mode if item has a mode
         navItems.forEach(n => n.classList.remove('active'));
-        // Mark all nav items for this tool as active
         navItems.forEach(n => {
-          if (n.dataset.tool === tool) n.classList.add('active');
+          if (n.dataset.tool !== tool) return;
+          const nMode = n.dataset.mode || null;
+          if (nMode === mode || (!nMode && !mode) || (!nMode && mode === null)) {
+            n.classList.add('active');
+          }
         });
 
         // Show matching panel, hide others
@@ -371,7 +374,9 @@
         });
 
         // Update topbar title
-        if (topbarTitle) topbarTitle.textContent = toolTitles[tool] || tool;
+        const titleKey = (tool === 'subnet-calc' && mode === 'drill') ? 'octet-drill' : tool;
+        const toolTitlesExt = Object.assign({ 'octet-drill': 'Octet Drill' }, toolTitles);
+        if (topbarTitle) topbarTitle.textContent = toolTitlesExt[titleKey] || toolTitles[tool] || tool;
 
         // Update topbar meta
         if (topbarMeta) {
@@ -407,9 +412,9 @@
           window.ACLBuilder.init();
         }
 
-        // Activate Subnet Calculator
+        // Activate Subnet Calculator (pass mode if present, e.g. 'drill')
         if (tool === 'subnet-calc' && window.SubnetCalc) {
-          window.SubnetCalc.init();
+          window.SubnetCalc.init(mode || undefined);
         }
 
         // Activate Study Site

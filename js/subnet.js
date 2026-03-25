@@ -1973,7 +1973,12 @@
   // ── Public API ────────────────────────────────────────────────────────────
 
   window.SubnetCalc = {
-    init() {
+    init (mode) {
+      if (mode) currentMode = mode;
+      render();
+    },
+    startMode (mode) {
+      currentMode = mode;
       render();
     },
   };
