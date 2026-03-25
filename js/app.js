@@ -374,8 +374,12 @@
         });
 
         // Update topbar title
-        const titleKey = (tool === 'subnet-calc' && mode === 'drill') ? 'octet-drill' : tool;
-        const toolTitlesExt = Object.assign({ 'octet-drill': 'Octet Drill' }, toolTitles);
+        const modeTitleMap = { 'drill': 'Octet Drill', 'tnlogic': '2\u207F Logic' };
+        const titleKey = tool;
+        const toolTitlesExt = Object.assign({}, toolTitles);
+        if (tool === 'subnet-calc' && mode && modeTitleMap[mode]) {
+          toolTitlesExt['subnet-calc'] = modeTitleMap[mode];
+        }
         if (topbarTitle) topbarTitle.textContent = toolTitlesExt[titleKey] || toolTitles[tool] || tool;
 
         // Update topbar meta

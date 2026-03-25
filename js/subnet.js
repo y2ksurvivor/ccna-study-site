@@ -1938,7 +1938,6 @@
           <button class="sn-tab ${currentMode === 'info'       ? 'active' : ''}" data-mode="info">Network Info</button>
           <button class="sn-tab ${currentMode === 'splitter'   ? 'active' : ''}" data-mode="splitter">Subnet Splitter</button>
           <button class="sn-tab ${currentMode === 'summarizer' ? 'active' : ''}" data-mode="summarizer">Summarizer</button>
-          <button class="sn-tab ${currentMode === 'tnlogic'   ? 'active' : ''}" data-mode="tnlogic">2&#x207F; Logic</button>
           <button class="sn-tab ${currentMode === 'divmethod' ? 'active' : ''}" data-mode="divmethod">Division Method</button>
         </div>`;
 
