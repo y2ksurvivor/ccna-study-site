@@ -141,6 +141,23 @@
 .stats-chip.chip-yellow .stats-chip-value { color: var(--yellow); }
 .stats-chip.chip-accent .stats-chip-value { color: var(--accent); }
 
+.btn-reset-progress {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 5px 14px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: color 0.15s, border-color 0.15s;
+}
+.btn-reset-progress:hover {
+  color: #e05252;
+  border-color: #e05252;
+}
+
 /* ── Start Buttons ──────────────────────────────────────── */
 .start-buttons {
   display: flex;

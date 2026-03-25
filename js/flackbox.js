@@ -190,6 +190,7 @@
               <span class="stats-chip-label">Coverage</span>
             </div>
           </div>
+          <button class="btn-reset-progress" id="fbBtnReset">↺ Reset Progress</button>
         </div>
 
         <div class="start-buttons">
@@ -239,10 +240,16 @@
       });
     });
 
-    const btnFC = el('fbBtnFlashcard');
-    const btnQz = el('fbBtnQuiz');
+    const btnFC    = el('fbBtnFlashcard');
+    const btnQz    = el('fbBtnQuiz');
+    const btnReset = el('fbBtnReset');
     if (btnFC) btnFC.addEventListener('click', startFlashcards);
     if (btnQz) btnQz.addEventListener('click', startQuiz);
+    if (btnReset) btnReset.addEventListener('click', () => {
+      if (!confirm('Reset all progress? This cannot be undone.')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderSetup();
+    });
   }
 
   // ─────────────────────────────────────────────────────────
