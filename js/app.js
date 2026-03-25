@@ -448,6 +448,10 @@
       p.style.display = p.id === 'tool-flackbox' ? '' : 'none';
     });
 
+    // Set initial topbar title to match default active tool
+    if (topbarTitle) topbarTitle.textContent = 'Flackbox Deck';
+    if (topbarMeta)  topbarMeta.innerHTML = `<span class="stat-chip">${FLACKBOX_CARDS.length} cards</span>`;
+
     // Flackbox init is triggered by splash.js after dismiss
   }
 
