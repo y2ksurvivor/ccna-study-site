@@ -312,6 +312,81 @@ input, button { outline: none; border: none; }
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  position: relative;
+}
+
+/* ── Global background particles (CSS-only, runs on every panel) ── */
+@keyframes bg-drift {
+  0%   { transform: translate(-50%, -50%) translate(0, 0);                opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)); opacity: 0; }
+}
+
+@keyframes bg-node-pulse {
+  0%, 100% { box-shadow: 0 0 10px 3px rgba(0,194,255,0.3); }
+  50%       { box-shadow: 0 0 20px 7px rgba(0,194,255,0.55); }
+}
+
+@keyframes bg-core-pulse {
+  0%, 100% { box-shadow: 0 0 10px 3px rgba(0,255,136,0.3); }
+  50%       { box-shadow: 0 0 22px 8px rgba(0,255,136,0.55); }
+}
+
+@keyframes bg-dot-glow {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 0.9; }
+}
+
+.bg-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-node {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #0f1117;
+  border: 1.5px solid #00c2ff;
+  color: #00c2ff;
+  font-family: 'Cascadia Code', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bg-drift linear infinite, bg-node-pulse 4s ease-in-out infinite;
+  opacity: 0;
+}
+
+.bg-node--core {
+  width: 44px;
+  height: 44px;
+  border-color: #00ff88;
+  color: #00ff88;
+  font-size: 11px;
+  animation: bg-drift linear infinite, bg-core-pulse 4s ease-in-out infinite;
+}
+
+.bg-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(0, 194, 255, 0.55);
+  box-shadow: 0 0 7px 2px rgba(0,194,255,0.3);
+  animation: bg-drift linear infinite, bg-dot-glow 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+.bg-dot--packet {
+  background: rgba(0, 255, 136, 0.65);
+  box-shadow: 0 0 7px 2px rgba(0,255,136,0.35);
 }
 
 /* ── Top Bar ────────────────────────────────────────────── */
@@ -357,6 +432,7 @@ input, button { outline: none; border: none; }
   overflow-y: auto;
   padding: 24px 28px 40px;
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;

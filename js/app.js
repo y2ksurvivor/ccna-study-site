@@ -436,4 +436,37 @@
     // Puzzle init is triggered by splash.js after dismiss
   }
 
+  // ── Global background particles (spawned once, CSS runs them forever) ────────
+  (function spawnBgParticles () {
+    const container = document.getElementById('bgParticles');
+    if (!container) return;
+
+    const NODES = ['R1','R2','R3','SW1','SW2','FW','ISP','Core','WAN','Dist','Edge','LAN'];
+
+    NODES.forEach((label, i) => {
+      const el = document.createElement('div');
+      el.className = 'bg-node' + (i < 3 ? ' bg-node--core' : '');
+      el.textContent = label;
+      el.style.left = (5 + Math.random() * 90) + '%';
+      el.style.top  = (5 + Math.random() * 90) + '%';
+      el.style.animationDuration = (20 + Math.random() * 25) + 's';
+      el.style.animationDelay   = -(Math.random() * 25) + 's';
+      el.style.setProperty('--dx', (Math.random() * 180 - 90) + 'px');
+      el.style.setProperty('--dy', (Math.random() * 180 - 90) + 'px');
+      container.appendChild(el);
+    });
+
+    for (let i = 0; i < 45; i++) {
+      const el = document.createElement('div');
+      el.className = 'bg-dot' + (Math.random() < 0.2 ? ' bg-dot--packet' : '');
+      el.style.left = (Math.random() * 100) + '%';
+      el.style.top  = (Math.random() * 100) + '%';
+      el.style.animationDuration = (10 + Math.random() * 20) + 's';
+      el.style.animationDelay   = -(Math.random() * 20) + 's';
+      el.style.setProperty('--dx', (Math.random() * 220 - 110) + 'px');
+      el.style.setProperty('--dy', (Math.random() * 220 - 110) + 'px');
+      container.appendChild(el);
+    }
+  })();
+
 })();
