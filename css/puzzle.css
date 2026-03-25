@@ -291,9 +291,110 @@
 
 .pz-new-btn:hover { background: var(--accent-hover); }
 
+/* ── Result Actions ────────────────────────────────────── */
+.pz-result-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pz-change-cat-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pz-change-cat-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Category Picker ───────────────────────────────────── */
+.pz-picker-intro {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.pz-cat-btn--all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+
+.pz-cat-btn--all:hover {
+  background: rgba(0, 194, 255, 0.08);
+}
+
+.pz-cat-btn--all .pz-cat-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.pz-cat-btn--all .pz-cat-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.pz-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.pz-cat-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.pz-cat-btn:hover {
+  border-color: var(--accent);
+  background: rgba(0, 194, 255, 0.05);
+}
+
+.pz-cat-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pz-cat-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 560px) {
   .pz-container { padding: 16px 12px 32px; }
   .pz-input-row { flex-direction: column; }
   .pz-submit { width: 100%; padding: 12px; }
+  .pz-cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .pz-result-actions { flex-direction: column; }
+  .pz-change-cat-btn { text-align: center; }
 }

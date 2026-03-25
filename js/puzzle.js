@@ -8,6 +8,24 @@
   const MAX_ATTEMPTS = 5;
   const PANEL = document.getElementById('tool-puzzle');
 
+  const CAT_LABELS = {
+    system:       'System',
+    vlan:         'VLAN',
+    interface:    'Interface',
+    security:     'Security',
+    dhcp:         'DHCP',
+    routing:      'Routing',
+    nat:          'NAT',
+    fhrp:         'HSRP/FHRP',
+    stp:          'STP',
+    etherchannel: 'EtherChannel',
+    ipv6:         'IPv6',
+    eigrp:        'EIGRP',
+    ospf:         'OSPF',
+  };
+
+  let selectedCategory = 'all';
+
   let state = {
     puzzle:   null,
     blank:    null,   // { idx, word }
@@ -18,9 +36,17 @@
 
   window.PuzzleGame = { init };
 
-  // ── Init ─────────────────────────────────────────────────────────────────────
+  // ── Init — shows category picker ─────────────────────────────────────────────
   function init () {
-    const puzzle = pickRandom();
+    if (window.NetworkBg) window.NetworkBg.init(PANEL);
+    renderCategoryPicker();
+  }
+
+  // ── Start a game with chosen category ────────────────────────────────────────
+  function startGame (category) {
+    selectedCategory = category;
+    const pool   = category === 'all' ? PUZZLES : PUZZLES.filter(p => p.category === category);
+    const puzzle = pool[Math.floor(Math.random() * pool.length)];
     state = {
       puzzle,
       blank:    getBlank(puzzle.answer),
@@ -29,11 +55,11 @@
       won:      false,
     };
     render();
-    if (window.NetworkBg) window.NetworkBg.init(PANEL);
   }
 
   function pickRandom () {
-    return PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+    const pool = selectedCategory === 'all' ? PUZZLES : PUZZLES.filter(p => p.category === selectedCategory);
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   // ── Blank Word Selection ──────────────────────────────────────────────────────
@@ -103,6 +129,52 @@
     }
   }
 
+  // ── Category Picker ───────────────────────────────────────────────────────────
+  function renderCategoryPicker () {
+    // Build category counts
+    const counts = {};
+    for (const p of PUZZLES) {
+      counts[p.category] = (counts[p.category] || 0) + 1;
+    }
+
+    // Sort by count desc
+    const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+    const catsHtml = cats.map(([cat, count]) => `
+      <button class="pz-cat-btn" data-cat="${cat}">
+        <span class="pz-cat-name">${esc(CAT_LABELS[cat] || cat)}</span>
+        <span class="pz-cat-count">${count} question${count !== 1 ? 's' : ''}</span>
+      </button>
+    `).join('');
+
+    PANEL.innerHTML = `
+      <div class="pz-container">
+        <div class="pz-header">
+          <h2 class="pz-title">Command Puzzle</h2>
+          <span class="stat-chip">${PUZZLES.length} questions</span>
+        </div>
+
+        <div class="pz-picker-intro">
+          <div class="pz-scenario-label">Choose a Category</div>
+          <p class="pz-scenario-text">Select a topic to practice, or test yourself across all categories.</p>
+        </div>
+
+        <button class="pz-cat-btn pz-cat-btn--all" data-cat="all">
+          <span class="pz-cat-name">All Categories</span>
+          <span class="pz-cat-count">${PUZZLES.length} questions</span>
+        </button>
+
+        <div class="pz-cat-grid">
+          ${catsHtml}
+        </div>
+      </div>
+    `;
+
+    PANEL.querySelectorAll('.pz-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => startGame(btn.dataset.cat));
+    });
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────────
   function render () {
     const { puzzle, blank, attempts, gameOver, won } = state;
@@ -157,11 +229,15 @@
       const msg = won
         ? `<strong>Correct!</strong> The full command is:`
         : `<strong>Not quite.</strong> The answer was:`;
+      const catLabel = selectedCategory === 'all' ? 'All Categories' : (CAT_LABELS[selectedCategory] || selectedCategory);
       bottomHtml = `
         <div class="pz-result ${cls}">
           <div class="pz-result-msg">${msg}</div>
           <div class="pz-result-cmd">${esc(puzzle.answer)}</div>
-          <button class="pz-new-btn" id="puzzleNew">Next Puzzle →</button>
+          <div class="pz-result-actions">
+            <button class="pz-new-btn" id="puzzleNew">Next Puzzle →</button>
+            <button class="pz-change-cat-btn" id="puzzleChangeCat">Change Category</button>
+          </div>
         </div>
       `;
     }
@@ -207,7 +283,16 @@
       const el = PANEL.querySelector('#puzzleInput');
       if (el) submitGuess(el.value);
     });
-    if (newEl) newEl.addEventListener('click', init);
+    if (newEl) newEl.addEventListener('click', () => startGame(selectedCategory));
+    const changeCatEl = PANEL.querySelector('#puzzleChangeCat');
+    if (changeCatEl) changeCatEl.addEventListener('click', renderCategoryPicker);
+
+    // Show current category in header subtitle
+    const header = PANEL.querySelector('.pz-header');
+    if (header && selectedCategory !== 'all') {
+      const chip = header.querySelector('.stat-chip');
+      if (chip) chip.title = `Filtering: ${CAT_LABELS[selectedCategory] || selectedCategory}`;
+    }
   }
 
   function esc (str) {
