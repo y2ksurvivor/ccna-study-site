@@ -152,11 +152,9 @@
   window.addEventListener('resize', resize);
   requestAnimationFrame(draw);
 
-  // ── Show prompt after pause ───────────────────────────────────────────────
-  setTimeout(() => msg.classList.add('splash-msg--visible'), 1800);
-
-  // ── Dismiss ───────────────────────────────────────────────────────────────
+  // ── Show prompt then enable dismiss ──────────────────────────────────────
   let dismissed = false;
+
   function dismiss () {
     if (dismissed) return;
     dismissed = true;
@@ -171,6 +169,10 @@
     }, 900);
   }
 
-  document.addEventListener('keydown', dismiss);
-  splash.addEventListener('click', dismiss);
+  // Wait for graphic to play, then show message and enable dismiss
+  setTimeout(() => {
+    msg.classList.add('splash-msg--visible');
+    document.addEventListener('keydown', dismiss);
+    splash.addEventListener('click', dismiss);
+  }, 1800);
 })();
