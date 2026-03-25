@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  NetDash — CCNA Quiz / Flashcard Question Bank
+//  Layer8 — CCNA Quiz / Flashcard Question Bank
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUIZ_TOPICS = [
