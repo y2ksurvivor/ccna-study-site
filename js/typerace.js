@@ -219,6 +219,8 @@
     } else {
       state.incorrect++;
       state.streak = 0;
+      // Re-queue at the end so they must get it right
+      state.session.push(puzzle);
     }
     showFeedback(puzzle, value, isCorrect ? 'correct' : 'incorrect');
   }
@@ -258,11 +260,11 @@
         <div class="cr-fb-left">
           <span class="cr-fb-icon">✗</span>
           <div>
-            <div class="cr-fb-status">Correct answer:</div>
+            <div class="cr-fb-status">Correct answer — you'll see this again:</div>
             <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
           </div>
         </div>
-        <button class="btn-next" id="crNext">${state.currentIdx + 1 < state.session.length ? 'Next →' : 'Results →'}</button>
+        <button class="btn-next" id="crNext">Got it →</button>
       `;
     } else {
       fb.className = 'cr-feedback cr-feedback--skipped';
