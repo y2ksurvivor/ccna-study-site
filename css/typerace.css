@@ -315,20 +315,13 @@
   border-radius: 20px;
   font-family: var(--font-mono);
 }
-.tr-btn-continue {
-  align-self: flex-start;
-  padding: 9px 20px;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  transition: transform 0.1s;
+.tr-explain-start-hint {
+  font-size: 12px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  animation: tr-blink 1s step-end infinite;
 }
-.tr-btn-continue:hover { transform: translateY(-1px); }
 
 /* ── Input ────────────────────────────────────────────────── */
 .tr-input-wrap { position: relative; }

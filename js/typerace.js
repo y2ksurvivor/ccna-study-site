@@ -251,6 +251,9 @@
 
     state.statsTimer = setInterval(tickStats, 150);
     state.oppTimer   = setInterval(tickOpponents, 100);
+
+    // Show context for first command before race begins
+    showPreCommandExplanation();
   }
 
   // ── Command display ───────────────────────────────────────
@@ -286,9 +289,17 @@
 
   // ── Keydown ───────────────────────────────────────────────
   function onKeydown (e) {
-    if (state.paused || state.done) return;
+    if (state.done) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'Tab') { e.preventDefault(); return; }
+
+    // Pre-command pause: first printable key resumes AND is processed
+    if (state.paused) {
+      if (e.key.length !== 1) return;
+      e.preventDefault();
+      resumeFromPause();
+      // fall through — process this key as the first typed character
+    }
 
     // Waiting for Enter to confirm completed command
     if (state.awaitingEnter) {
@@ -355,27 +366,25 @@
       clearInterval(state.oppTimer);
       setTimeout(finishRace, 300);
     } else {
-      showExplanation(justFinishedIdx);
+      showPreCommandExplanation();
     }
   }
 
-  // ── Explanation pause ─────────────────────────────────────
-  function showExplanation (puzzleIdx) {
+  // ── Pre-command explanation pause ────────────────────────
+  function showPreCommandExplanation () {
     state.paused = true;
-    clearInterval(state.oppTimer); // freeze opponents during explanation
 
-    const puzzle   = state.puzzles[puzzleIdx];
-    const heading  = el('trCmdHeading');
-    const display  = el('trCmdDisplay');
-    const explain  = el('trExplain');
-    const inputWrap = el('trInputWrap');
+    const puzzle  = state.puzzles[state.currentIdx];
+    const heading = el('trCmdHeading');
+    const display = el('trCmdDisplay');
+    const explain = el('trExplain');
+    const label   = el('trCmdLabel');
 
-    if (heading) heading.textContent = 'Command complete ✓';
+    if (heading) heading.textContent = 'Get ready…';
+    if (label)   label.textContent = `Command ${state.currentIdx + 1} of ${state.commands.length}`;
 
-    // Show the completed command all-green with prompt
-    if (display) display.innerHTML = buildCompletedCmdHTML(puzzle);
-
-    if (inputWrap) inputWrap.style.display = 'none';
+    // Show command in full-pending state so user can see what's coming
+    if (display) display.innerHTML = buildCmdHTML();
 
     if (explain) {
       explain.style.display = 'block';
@@ -386,41 +395,23 @@
             <span class="tr-explain-unit">${esc(puzzle.unit)}</span>
             <span class="tr-explain-mode">${puzzle.mode === 'config' ? 'config mode' : 'exec mode'}</span>
           </div>
-          <button class="tr-btn-continue" id="trContinueBtn">
-            Next Command →
-          </button>
+          <div class="tr-explain-start-hint">Start typing to race…</div>
         </div>
       `;
-      const continueBtn = el('trContinueBtn');
-      continueBtn.addEventListener('click', resumeRace);
-      continueBtn.focus(); // Enter key will activate it
     }
-  }
 
-  function resumeRace () {
-    state.paused = false;
-
-    const heading   = el('trCmdHeading');
-    const display   = el('trCmdDisplay');
-    const explain   = el('trExplain');
-    const inputWrap = el('trInputWrap');
-
-    if (heading)   heading.textContent = 'Type this command';
-    if (explain)   explain.style.display = 'none';
-    if (inputWrap) inputWrap.style.display = '';
-    if (display)   display.innerHTML = buildCmdHTML();
-
-    // Update command label
-    const cmdLabel = el('trCmdLabel');
-    if (cmdLabel) cmdLabel.textContent = `Command ${state.currentIdx + 1} of ${state.commands.length}`;
-
-    // Resume opponent timer
-    state.oppTimer = setInterval(tickOpponents, 100);
-
-    // Re-focus input
-    state.awaitingEnter = false;
     const input = el('trInput');
     if (input) { input.value = ''; input.focus(); }
+  }
+
+  function resumeFromPause () {
+    state.paused = false;
+
+    const heading = el('trCmdHeading');
+    const explain = el('trExplain');
+
+    if (heading) heading.textContent = 'Type this command';
+    if (explain) explain.style.display = 'none';
   }
 
   // ── Refresh display ───────────────────────────────────────
