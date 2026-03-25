@@ -252,14 +252,32 @@
   }
 
   // ── Command display ───────────────────────────────────────
+  function promptFor (puzzle) {
+    if (!puzzle) return 'Router#';
+    return puzzle.mode === 'config' ? 'Router(config)#' : 'Router#';
+  }
+
   function buildCmdHTML () {
-    const cmd = state.commands[state.currentIdx] || '';
-    return cmd.split('').map((ch, i) => {
+    const cmd    = state.commands[state.currentIdx] || '';
+    const prompt = promptFor(state.puzzles[state.currentIdx]);
+    const promptSpan = `<span class="tr-ch-prompt">${esc(prompt)}\u00a0</span>`;
+    const chars = cmd.split('').map((ch, i) => {
       const d = ch === ' ' ? '\u00a0' : esc(ch);
       if (i < state.currentPos)     return `<span class="tr-ch tr-ch-correct">${d}</span>`;
       if (i === state.currentPos)   return `<span class="tr-ch ${state.hasError ? 'tr-ch-error' : 'tr-ch-cursor'}">${d}</span>`;
       return `<span class="tr-ch tr-ch-pending">${d}</span>`;
     }).join('');
+    return promptSpan + chars;
+  }
+
+  function buildCompletedCmdHTML (puzzle) {
+    const prompt = promptFor(puzzle);
+    const promptSpan = `<span class="tr-ch-prompt">${esc(prompt)}\u00a0</span>`;
+    const chars = puzzle.answer.trim().split('').map(ch => {
+      const d = ch === ' ' ? '\u00a0' : esc(ch);
+      return `<span class="tr-ch tr-ch-correct">${d}</span>`;
+    }).join('');
+    return promptSpan + chars;
   }
 
   // ── Keydown ───────────────────────────────────────────────
@@ -335,13 +353,8 @@
 
     if (heading) heading.textContent = 'Command complete ✓';
 
-    // Show the completed command all-green
-    if (display) {
-      display.innerHTML = puzzle.answer.trim().split('').map(ch => {
-        const d = ch === ' ' ? '\u00a0' : esc(ch);
-        return `<span class="tr-ch tr-ch-correct">${d}</span>`;
-      }).join('');
-    }
+    // Show the completed command all-green with prompt
+    if (display) display.innerHTML = buildCompletedCmdHTML(puzzle);
 
     if (inputWrap) inputWrap.style.display = 'none';
 
@@ -359,7 +372,9 @@
           </button>
         </div>
       `;
-      el('trContinueBtn').addEventListener('click', resumeRace);
+      const continueBtn = el('trContinueBtn');
+      continueBtn.addEventListener('click', resumeRace);
+      continueBtn.focus(); // Enter key will activate it
     }
   }
 

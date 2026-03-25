@@ -241,6 +241,7 @@
 
 /* Characters */
 .tr-ch { display: inline; }
+.tr-ch-prompt  { color: #4ade80; font-weight: 600; user-select: none; }
 .tr-ch-pending { color: var(--text-muted); }
 .tr-ch-correct { color: var(--text-primary); }
 .tr-ch-cursor {
