@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  Layer8 — Type Race
+//  Layer8 — Type Race v2
 // ─────────────────────────────────────────────────────────────────────────────
 
 (function () {
@@ -8,18 +8,40 @@
   const PANEL_ID  = 'tool-typerace';
   const RACE_SIZE = 8;
 
+  const OPP_DEFS = [
+    { name: 'NoviceNet', wpm: 22, fill: '#e05252' },
+    { name: 'OSPF_Pro',  wpm: 44, fill: '#f5a623' },
+    { name: 'RouteKing', wpm: 63, fill: '#6bcb77' },
+  ];
+
   // ── State ─────────────────────────────────────────────────
   const state = {
-    commands:    [],
-    currentIdx:  0,
-    currentPos:  0,   // correct chars typed in current command
-    hasError:    false,
-    startTime:   null,
-    totalErrors: 0,
+    puzzles:    [],
+    commands:   [],
+    currentIdx: 0,
+    currentPos: 0,
+    hasError:   false,
+    startTime:  null,
+    paused:     false,
+    done:       false,
+    totalErrors:         0,
     totalCharsCompleted: 0,
-    statsTimer:  null,
-    done:        false,
+    statsTimer: null,
+    oppTimer:   null,
+    opponents:  [],
+    playerFinishTime: null,
   };
+
+  function resetOpponents () {
+    state.opponents = OPP_DEFS.map(o => ({
+      name:       o.name,
+      wpm:        o.wpm,
+      fill:       o.fill,
+      charsTyped: 0,
+      finished:   false,
+      finishTime: null,
+    }));
+  }
 
   // ── Helpers ───────────────────────────────────────────────
   function el (id)  { return document.getElementById(id); }
@@ -27,9 +49,7 @@
 
   function esc (str) {
     return String(str || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function shuffle (arr) {
@@ -41,51 +61,76 @@
     return a;
   }
 
-  // ── Command pool ──────────────────────────────────────────
-  // Use puzzle answers — concrete, typeable IOS commands
   function buildPool () {
-    return PUZZLES
-      .map(p => p.answer.trim())
-      .filter(a =>
-        a.length >= 8 &&
-        a.length <= 52 &&
-        !a.includes('\n') &&
-        !a.includes('<') &&
-        !a.includes('[')
-      );
+    return PUZZLES.filter(p => {
+      const a = p.answer.trim();
+      return a.length >= 8 && a.length <= 52 &&
+             !a.includes('\n') && !a.includes('<') && !a.includes('[');
+    });
   }
 
-  // ── Stats ─────────────────────────────────────────────────
+  // ── Math ──────────────────────────────────────────────────
+  function totalRaceChars () {
+    return state.commands.reduce((s, c) => s + c.length, 0);
+  }
+
+  function playerProgress () {
+    const t = totalRaceChars();
+    return t ? ((state.totalCharsCompleted + state.currentPos) / t) * 100 : 0;
+  }
+
+  function oppProgress (opp) {
+    const t = totalRaceChars();
+    return t ? Math.min(100, (opp.charsTyped / t) * 100) : 0;
+  }
+
   function calcWPM () {
     if (!state.startTime) return 0;
     const mins = (Date.now() - state.startTime) / 60000;
     if (mins < 0.001) return 0;
-    const chars = state.totalCharsCompleted + state.currentPos;
-    return Math.round((chars / 5) / mins);
+    return Math.round(((state.totalCharsCompleted + state.currentPos) / 5) / mins);
   }
 
   function calcAccuracy () {
     const total = state.totalCharsCompleted + state.currentPos + state.totalErrors;
-    if (total === 0) return 100;
-    return Math.max(0, Math.round(((total - state.totalErrors) / total) * 100));
-  }
-
-  function calcProgress () {
-    const totalChars = state.commands.reduce((s, c) => s + c.length, 0);
-    if (!totalChars) return 0;
-    return ((state.totalCharsCompleted + state.currentPos) / totalChars) * 100;
+    return total ? Math.max(0, Math.round(((total - state.totalErrors) / total) * 100)) : 100;
   }
 
   function wpmGrade (wpm) {
-    if (wpm >= 80) return 'Network Engineer speed';
+    if (wpm >= 80) return 'Network Engineer speed 🚀';
     if (wpm >= 60) return 'Solid — above average';
-    if (wpm >= 40) return 'Keep practicing';
-    return 'You\'ll get faster';
+    if (wpm >= 40) return 'Getting there — keep it up';
+    return 'Practice makes perfect';
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  SETUP
-  // ─────────────────────────────────────────────────────────
+  // ── SVGs ──────────────────────────────────────────────────
+  function playerCarSVG () {
+    return `<svg width="48" height="22" viewBox="0 0 48 22">
+      <rect x="4" y="8" width="38" height="9" rx="2.5" fill="var(--accent)"/>
+      <path d="M11 8 L14 3 H32 L37 8 Z" fill="var(--accent)"/>
+      <rect x="15" y="3.5" width="7" height="4" rx="1" fill="rgba(6,8,16,0.55)"/>
+      <rect x="24" y="3.5" width="6" height="4" rx="1" fill="rgba(6,8,16,0.55)"/>
+      <circle cx="13" cy="18" r="3.5" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
+      <circle cx="13" cy="18" r="1.2" fill="var(--accent)" opacity="0.5"/>
+      <circle cx="35" cy="18" r="3.5" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
+      <circle cx="35" cy="18" r="1.2" fill="var(--accent)" opacity="0.5"/>
+      <rect x="41" y="10" width="5" height="3" rx="1" fill="#fff" opacity="0.85"/>
+      <rect x="2"  y="10" width="4" height="3" rx="1" fill="#ff4444" opacity="0.9"/>
+    </svg>`;
+  }
+
+  function oppCarSVG (fill) {
+    return `<svg width="40" height="18" viewBox="0 0 40 18">
+      <rect x="3" y="7" width="32" height="7" rx="2" fill="${fill}" opacity="0.85"/>
+      <path d="M9 7 L12 2 H27 L31 7 Z" fill="${fill}" opacity="0.85"/>
+      <circle cx="11" cy="15" r="3" fill="#0d1017" stroke="${fill}" stroke-width="1.2"/>
+      <circle cx="29" cy="15" r="3" fill="#0d1017" stroke="${fill}" stroke-width="1.2"/>
+      <rect x="34" y="8"  width="4" height="2.5" rx="0.5" fill="#fff" opacity="0.5"/>
+      <rect x="2"  y="8" width="3" height="2.5" rx="0.5" fill="#f00" opacity="0.5"/>
+    </svg>`;
+  }
+
+  // ── Setup ─────────────────────────────────────────────────
   function renderSetup () {
     panel().innerHTML = `
       <div class="tr-setup">
@@ -93,15 +138,21 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v5"/>
             <circle cx="18" cy="17" r="3"/><circle cx="7" cy="17" r="3"/>
-            <path d="M7 17V5M17 17v-2"/>
           </svg>
         </div>
-        <h2>Type Race</h2>
-        <p>Race through ${RACE_SIZE} IOS commands. Type faster, drive faster.</p>
+        <h2>Commands v2</h2>
+        <p>Race ${OPP_DEFS.length} opponents through ${RACE_SIZE} IOS commands.<br>Each command pauses for a quick explanation.</p>
+        <div class="tr-opp-preview">
+          ${OPP_DEFS.map(o => `
+            <div class="tr-opp-chip">
+              <span class="tr-opp-dot" style="background:${o.fill}"></span>
+              <span>${esc(o.name)}</span>
+              <span class="tr-opp-wpm">~${o.wpm} WPM</span>
+            </div>
+          `).join('')}
+        </div>
         <button class="tr-btn-start" id="trStartBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5,3 19,12 5,21"/>
-          </svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
           Start Race
         </button>
       </div>
@@ -109,145 +160,113 @@
     el('trStartBtn').addEventListener('click', startRace);
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  RACE
-  // ─────────────────────────────────────────────────────────
+  // ── Race ──────────────────────────────────────────────────
   function startRace () {
     clearInterval(state.statsTimer);
-    const pool = buildPool();
+    clearInterval(state.oppTimer);
+    resetOpponents();
+    const pool = shuffle(buildPool()).slice(0, RACE_SIZE);
     Object.assign(state, {
-      commands:            shuffle(pool).slice(0, RACE_SIZE),
-      currentIdx:          0,
-      currentPos:          0,
-      hasError:            false,
-      startTime:           null,
+      puzzles:   pool,
+      commands:  pool.map(p => p.answer.trim()),
+      currentIdx: 0,
+      currentPos: 0,
+      hasError:   false,
+      startTime:  null,
+      paused:     false,
+      done:       false,
       totalErrors:         0,
       totalCharsCompleted: 0,
-      done:                false,
+      playerFinishTime:    null,
     });
     renderRace();
   }
 
-  function renderRace () {
-    const cmd  = state.commands[state.currentIdx] || '';
-    const pct  = calcProgress();
-    const carX = Math.max(3, Math.min(87, pct));
+  function buildLanesHTML () {
+    const pPct = playerProgress();
+    let html = `
+      <div class="tr-lane">
+        <span class="tr-lane-label tr-lane-label--player">You</span>
+        <div class="tr-lane-road" id="trPlayerRoad">
+          <div class="tr-road-anim" id="trRoadAnim"></div>
+          <div class="tr-lane-car" id="trCarPlayer" style="left:${Math.max(3,Math.min(87,pPct))}%">${playerCarSVG()}</div>
+          <div class="tr-lane-flag">🏁</div>
+        </div>
+      </div>
+    `;
+    state.opponents.forEach((opp, i) => {
+      const oPct = oppProgress(opp);
+      html += `
+        <div class="tr-lane">
+          <span class="tr-lane-label" style="color:${opp.fill}">${esc(opp.name)}</span>
+          <div class="tr-lane-road">
+            <div class="tr-lane-car" id="trCarOpp${i}" style="left:${Math.max(3,Math.min(87,oPct))}%">${oppCarSVG(opp.fill)}</div>
+            <div class="tr-lane-flag">🏁</div>
+          </div>
+        </div>
+      `;
+    });
+    return html;
+  }
 
+  function renderRace () {
     panel().innerHTML = `
       <div class="tr-race">
 
-        <!-- Stats -->
         <div class="tr-stats-bar">
-          <div class="tr-stat">
-            <span class="tr-stat-value" id="trWpm">0</span>
-            <span class="tr-stat-label">WPM</span>
-          </div>
-          <div class="tr-stat">
-            <span class="tr-stat-value" id="trAcc">100%</span>
-            <span class="tr-stat-label">Accuracy</span>
-          </div>
-          <div class="tr-stat">
-            <span class="tr-stat-value" id="trTime">0:00</span>
-            <span class="tr-stat-label">Time</span>
-          </div>
-          <div class="tr-stat">
-            <span class="tr-stat-value" id="trErrors">0</span>
-            <span class="tr-stat-label">Errors</span>
-          </div>
+          <div class="tr-stat"><span class="tr-stat-value" id="trWpm">0</span><span class="tr-stat-label">WPM</span></div>
+          <div class="tr-stat"><span class="tr-stat-value" id="trAcc">100%</span><span class="tr-stat-label">Accuracy</span></div>
+          <div class="tr-stat"><span class="tr-stat-value" id="trTime">0:00</span><span class="tr-stat-label">Time</span></div>
+          <div class="tr-stat"><span class="tr-stat-value" id="trErrors">0</span><span class="tr-stat-label">Errors</span></div>
         </div>
 
-        <!-- Track -->
         <div class="tr-track-wrap">
-          <div class="tr-track">
-            <div class="tr-road-lines" id="trRoadLines"></div>
-            <div class="tr-road-center" id="trRoadCenter"></div>
-            <div class="tr-car" id="trCar" style="left:${carX}%">
-              ${carSVG()}
-            </div>
-            <div class="tr-flag">🏁</div>
-          </div>
+          <div class="tr-track" id="trTrack">${buildLanesHTML()}</div>
           <div class="tr-track-meta">
-            <span>Command ${state.currentIdx + 1} of ${state.commands.length}</span>
-            <span id="trPctLabel">${Math.round(pct)}% complete</span>
+            <span id="trCmdLabel">Command 1 of ${state.commands.length}</span>
+            <span id="trPctLabel">0% complete</span>
           </div>
         </div>
 
-        <!-- Command display -->
         <div class="tr-command-wrap">
-          <div class="tr-command-label">Type this command</div>
-          <div class="tr-command-display" id="trCmdDisplay">${buildCmdHTML(cmd)}</div>
+          <div class="tr-command-label" id="trCmdHeading">Type this command</div>
+          <div class="tr-command-display" id="trCmdDisplay">${buildCmdHTML()}</div>
+          <div class="tr-explain" id="trExplain" style="display:none"></div>
         </div>
 
-        <!-- Input -->
-        <div class="tr-input-wrap">
-          <input
-            id="trInput"
-            class="tr-input"
-            type="text"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            placeholder="Start typing…"
-          />
+        <div class="tr-input-wrap" id="trInputWrap">
+          <input id="trInput" class="tr-input" type="text"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="Start typing…"/>
           <div class="tr-input-hint">Backspace to correct errors</div>
         </div>
 
       </div>
     `;
 
-    // Focus and bind
-    const input = el('trInput');
-    input.focus();
-    input.addEventListener('keydown', onKeydown);
+    el('trInput').focus();
+    el('trInput').addEventListener('keydown', onKeydown);
 
-    // Live stats ticker
     state.statsTimer = setInterval(tickStats, 150);
+    state.oppTimer   = setInterval(tickOpponents, 100);
   }
 
-  function carSVG () {
-    return `
-      <svg width="54" height="26" viewBox="0 0 54 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- body -->
-        <rect x="4"  y="10" width="44" height="11" rx="3" fill="var(--accent)"/>
-        <!-- cab -->
-        <path d="M12 10 L16 3 H36 L42 10 Z" fill="var(--accent)"/>
-        <!-- windows -->
-        <rect x="17" y="4"  width="8"  height="5" rx="1" fill="rgba(6,8,16,0.6)"/>
-        <rect x="27" y="4"  width="8"  height="5" rx="1" fill="rgba(6,8,16,0.6)"/>
-        <!-- wheels -->
-        <circle cx="14" cy="22" r="4" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
-        <circle cx="14" cy="22" r="1.5" fill="var(--accent)" opacity="0.6"/>
-        <circle cx="40" cy="22" r="4" fill="#0d1017" stroke="var(--accent)" stroke-width="1.5"/>
-        <circle cx="40" cy="22" r="1.5" fill="var(--accent)" opacity="0.6"/>
-        <!-- headlight -->
-        <rect x="47" y="12" width="5" height="4" rx="1" fill="#fff" opacity="0.9"/>
-        <!-- taillight -->
-        <rect x="2"  y="12" width="4" height="4" rx="1" fill="#ff4444" opacity="0.9"/>
-      </svg>
-    `;
-  }
-
-  function buildCmdHTML (cmd) {
-    if (!cmd) return '';
+  // ── Command display ───────────────────────────────────────
+  function buildCmdHTML () {
+    const cmd = state.commands[state.currentIdx] || '';
     return cmd.split('').map((ch, i) => {
-      const display = ch === ' ' ? '\u00a0' : esc(ch);
-      if (i < state.currentPos) {
-        return `<span class="tr-ch tr-ch-correct">${display}</span>`;
-      }
-      if (i === state.currentPos) {
-        const cls = state.hasError ? 'tr-ch tr-ch-error' : 'tr-ch tr-ch-cursor';
-        return `<span class="${cls}">${display}</span>`;
-      }
-      return `<span class="tr-ch tr-ch-pending">${display}</span>`;
+      const d = ch === ' ' ? '\u00a0' : esc(ch);
+      if (i < state.currentPos)     return `<span class="tr-ch tr-ch-correct">${d}</span>`;
+      if (i === state.currentPos)   return `<span class="tr-ch ${state.hasError ? 'tr-ch-error' : 'tr-ch-cursor'}">${d}</span>`;
+      return `<span class="tr-ch tr-ch-pending">${d}</span>`;
     }).join('');
   }
 
-  // ── Keydown handler ───────────────────────────────────────
+  // ── Keydown ───────────────────────────────────────────────
   function onKeydown (e) {
+    if (state.paused || state.done) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'Tab') { e.preventDefault(); return; }
-    if (state.done) return;
 
     const cmd = state.commands[state.currentIdx];
     if (!cmd) return;
@@ -266,27 +285,32 @@
     if (e.key.length !== 1) return;
     e.preventDefault();
 
-    // Start timer on first real keypress
     if (!state.startTime) state.startTime = Date.now();
 
-    const expected = cmd[state.currentPos];
-    if (e.key === expected && !state.hasError) {
+    if (e.key === cmd[state.currentPos] && !state.hasError) {
       state.currentPos++;
-      state.hasError = false;
 
       if (state.currentPos >= cmd.length) {
-        // Command complete — advance
+        // Command complete
         state.totalCharsCompleted += cmd.length;
+        const justFinishedIdx = state.currentIdx;
         state.currentIdx++;
         state.currentPos = 0;
         state.hasError   = false;
 
+        refreshDisplay();
+
         if (state.currentIdx >= state.commands.length) {
+          // Race done
+          state.playerFinishTime = Date.now() - state.startTime;
           clearInterval(state.statsTimer);
-          refreshDisplay();
+          clearInterval(state.oppTimer);
           setTimeout(finishRace, 300);
-          return;
+        } else {
+          // Show explanation then continue
+          showExplanation(justFinishedIdx);
         }
+        return;
       }
     } else {
       if (!state.hasError) {
@@ -298,39 +322,104 @@
     refreshDisplay();
   }
 
-  function refreshDisplay () {
-    const cmd     = state.commands[state.currentIdx];
-    const display = el('trCmdDisplay');
-    const car     = el('trCar');
-    const input   = el('trInput');
-    const pctLbl  = el('trPctLabel');
-    const roads   = [el('trRoadLines'), el('trRoadCenter')];
+  // ── Explanation pause ─────────────────────────────────────
+  function showExplanation (puzzleIdx) {
+    state.paused = true;
+    clearInterval(state.oppTimer); // freeze opponents during explanation
 
-    if (display && cmd !== undefined) {
-      display.innerHTML = buildCmdHTML(cmd || '');
+    const puzzle   = state.puzzles[puzzleIdx];
+    const heading  = el('trCmdHeading');
+    const display  = el('trCmdDisplay');
+    const explain  = el('trExplain');
+    const inputWrap = el('trInputWrap');
+
+    if (heading) heading.textContent = 'Command complete ✓';
+
+    // Show the completed command all-green
+    if (display) {
+      display.innerHTML = puzzle.answer.trim().split('').map(ch => {
+        const d = ch === ' ' ? '\u00a0' : esc(ch);
+        return `<span class="tr-ch tr-ch-correct">${d}</span>`;
+      }).join('');
     }
 
-    const pct  = calcProgress();
-    const carX = Math.max(3, Math.min(87, pct));
-    if (car)    car.style.left = carX + '%';
-    if (pctLbl) pctLbl.textContent = Math.round(pct) + '% complete';
+    if (inputWrap) inputWrap.style.display = 'none';
 
-    // Road scroll speed scales with WPM (higher WPM → faster road)
-    const wpm   = calcWPM();
-    const speed = Math.max(0.15, 0.8 - wpm * 0.005);
-    roads.forEach(r => { if (r) r.style.animationDuration = speed + 's'; });
+    if (explain) {
+      explain.style.display = 'block';
+      explain.innerHTML = `
+        <div class="tr-explain-inner">
+          <div class="tr-explain-context">${esc(puzzle.scenario)}</div>
+          <div class="tr-explain-meta">
+            <span class="tr-explain-unit">${esc(puzzle.unit)}</span>
+            <span class="tr-explain-mode">${puzzle.mode === 'config' ? 'config mode' : 'exec mode'}</span>
+          </div>
+          <button class="tr-btn-continue" id="trContinueBtn">
+            Next Command →
+          </button>
+        </div>
+      `;
+      el('trContinueBtn').addEventListener('click', resumeRace);
+    }
+  }
 
+  function resumeRace () {
+    state.paused = false;
+
+    const heading   = el('trCmdHeading');
+    const display   = el('trCmdDisplay');
+    const explain   = el('trExplain');
+    const inputWrap = el('trInputWrap');
+
+    if (heading)   heading.textContent = 'Type this command';
+    if (explain)   explain.style.display = 'none';
+    if (inputWrap) inputWrap.style.display = '';
+    if (display)   display.innerHTML = buildCmdHTML();
+
+    // Update command label
+    const cmdLabel = el('trCmdLabel');
+    if (cmdLabel) cmdLabel.textContent = `Command ${state.currentIdx + 1} of ${state.commands.length}`;
+
+    // Resume opponent timer
+    state.oppTimer = setInterval(tickOpponents, 100);
+
+    // Re-focus input
+    const input = el('trInput');
+    if (input) { input.value = ''; input.focus(); }
+  }
+
+  // ── Refresh display ───────────────────────────────────────
+  function refreshDisplay () {
+    const display = el('trCmdDisplay');
+    if (display && !state.paused) display.innerHTML = buildCmdHTML();
+
+    const pPct = playerProgress();
+    const car  = el('trCarPlayer');
+    if (car) car.style.left = Math.max(3, Math.min(87, pPct)) + '%';
+
+    const pctLbl = el('trPctLabel');
+    if (pctLbl) pctLbl.textContent = Math.round(pPct) + '% complete';
+
+    // Road scroll speed proportional to WPM
+    const road = el('trRoadAnim');
+    if (road) {
+      const wpm   = calcWPM();
+      const speed = Math.max(0.1, 0.75 - wpm * 0.005);
+      road.style.animationDuration = speed + 's';
+    }
+
+    const input = el('trInput');
     if (input) input.classList.toggle('tr-input--error', state.hasError);
 
     tickStats();
   }
 
+  // ── Tickers ───────────────────────────────────────────────
   function tickStats () {
     const wpmEl  = el('trWpm');
     const accEl  = el('trAcc');
     const timeEl = el('trTime');
     const errEl  = el('trErrors');
-
     if (wpmEl)  wpmEl.textContent  = calcWPM();
     if (accEl)  accEl.textContent  = calcAccuracy() + '%';
     if (errEl)  errEl.textContent  = state.totalErrors;
@@ -340,24 +429,61 @@
     }
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  RESULTS
-  // ─────────────────────────────────────────────────────────
+  function tickOpponents () {
+    if (state.paused || state.done) return;
+    const total = totalRaceChars();
+    if (!total || !state.startTime) return;
+
+    const dt = 0.1; // seconds per tick
+
+    state.opponents.forEach((opp, i) => {
+      if (opp.finished) return;
+      const charsPerSec = (opp.wpm * 5) / 60;
+      opp.charsTyped = Math.min(total, opp.charsTyped + charsPerSec * dt);
+      if (opp.charsTyped >= total) {
+        opp.charsTyped  = total;
+        opp.finished    = true;
+        opp.finishTime  = Date.now() - state.startTime;
+      }
+      const oPct = oppProgress(opp);
+      const carEl = el('trCarOpp' + i);
+      if (carEl) carEl.style.left = Math.max(3, Math.min(87, oPct)) + '%';
+    });
+  }
+
+  // ── Results ───────────────────────────────────────────────
   function finishRace () {
-    clearInterval(state.statsTimer);
     state.done = true;
+    clearInterval(state.statsTimer);
+    clearInterval(state.oppTimer);
 
     const wpm = calcWPM();
     const acc = calcAccuracy();
-    const elapsed = state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0;
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
+    const playerMs = state.playerFinishTime || 0;
+    const playerSec = playerMs / 1000;
+
+    // Rank all finishers
+    const entries = [
+      { name: 'You', ms: playerMs, wpm, isPlayer: true },
+      ...state.opponents.map(o => ({
+        name: o.name,
+        ms:   o.finishTime || (totalRaceChars() / ((o.wpm * 5) / 60) * 1000),
+        wpm:  o.wpm,
+        fill: o.fill,
+        isPlayer: false,
+      })),
+    ].sort((a, b) => a.ms - b.ms);
+
+    const playerPlace = entries.findIndex(e => e.isPlayer) + 1;
+    const placeLabel  = ['🥇 1st', '🥈 2nd', '🥉 3rd', '4th'][playerPlace - 1] || `${playerPlace}th`;
+    const mins = Math.floor(playerSec / 60);
+    const secs = Math.floor(playerSec % 60);
 
     panel().innerHTML = `
       <div class="tr-results">
         <div class="tr-results-header">
-          <div class="tr-trophy">🏆</div>
-          <h2>Race Complete!</h2>
+          <div class="tr-trophy">${playerPlace === 1 ? '🏆' : playerPlace === 2 ? '🥈' : playerPlace === 3 ? '🥉' : '🏁'}</div>
+          <h2>Race Complete — ${placeLabel}!</h2>
         </div>
 
         <div class="tr-result-grid">
@@ -379,13 +505,28 @@
           </div>
         </div>
 
+        <div class="tr-standings">
+          <div class="tr-standings-title">Final Standings</div>
+          ${entries.map((e, i) => {
+            const t = Math.floor(e.ms / 1000);
+            const tm = Math.floor(t / 60) + ':' + String(t % 60).padStart(2,'0');
+            const medal = ['🥇','🥈','🥉',''][i] || '';
+            return `
+              <div class="tr-standing-row ${e.isPlayer ? 'tr-standing-row--player' : ''}">
+                <span class="tr-standing-place">${medal} ${i + 1}</span>
+                <span class="tr-standing-name" ${e.fill ? `style="color:${e.fill}"` : ''}>${esc(e.name)}</span>
+                <span class="tr-standing-time">${tm}</span>
+                <span class="tr-standing-wpm">${e.wpm} WPM</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
         <div class="tr-wpm-grade">${wpmGrade(wpm)}</div>
 
         <button class="tr-btn-start" id="trNewRace">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5,3 19,12 5,21"/>
-          </svg>
-          New Race
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          Race Again
         </button>
       </div>
     `;
