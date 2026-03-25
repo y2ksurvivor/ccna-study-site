@@ -138,7 +138,8 @@
     const idx    = state.currentIdx;
     const total  = state.session.length;
     const pct    = Math.round((idx / total) * 100);
-    state.answered = false;
+    state.answered  = false;
+    let hintWords   = 0;
 
     panel().innerHTML = `
       <div class="cr-wrap">
@@ -196,10 +197,15 @@
     });
 
     el('crHint').addEventListener('click', () => {
+      if (state.answered) return;
+      const words = puzzle.answer.split(' ');
+      hintWords = Math.min(hintWords + 1, words.length);
+      const revealed = words.slice(0, hintWords).join(' ');
       const btn = el('crHint');
-      btn.textContent = puzzle.hint;
+      btn.textContent = hintWords < words.length
+        ? revealed + ' …'
+        : revealed;
       btn.classList.add('cr-hint-btn--revealed');
-      btn.disabled = true;
     });
   }
 
