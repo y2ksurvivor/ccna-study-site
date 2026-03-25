@@ -222,13 +222,35 @@
       state.correct++;
       state.streak++;
       if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+      showFeedback(puzzle, value, 'correct');
     } else {
       state.incorrect++;
       state.streak = 0;
-      // Re-queue at the end so they must get it right
-      state.session.push(puzzle);
+      showRetry(puzzle);
     }
-    showFeedback(puzzle, value, isCorrect ? 'correct' : 'incorrect');
+  }
+
+  function showRetry (puzzle) {
+    const fb = el('crFeedback');
+    fb.style.display = '';
+    fb.className = 'cr-feedback cr-feedback--incorrect';
+    fb.innerHTML = `
+      <div class="cr-fb-left">
+        <span class="cr-fb-icon">✗</span>
+        <div>
+          <div class="cr-fb-status">Not quite — try again:</div>
+          <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
+        </div>
+      </div>
+    `;
+
+    const badge = el('crStreakBadge');
+    if (badge) badge.textContent = '';
+
+    const input = el('crInput');
+    input.value = '';
+    input.disabled = false;
+    input.focus();
   }
 
   function showFeedback (puzzle, typed, result) {
@@ -259,18 +281,6 @@
           </div>
         </div>
         <button class="btn-next" id="crNext">${state.currentIdx + 1 < state.session.length ? 'Next →' : 'Results →'}</button>
-      `;
-    } else if (result === 'incorrect') {
-      fb.className = 'cr-feedback cr-feedback--incorrect';
-      fb.innerHTML = `
-        <div class="cr-fb-left">
-          <span class="cr-fb-icon">✗</span>
-          <div>
-            <div class="cr-fb-status">Correct answer — you'll see this again:</div>
-            <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
-          </div>
-        </div>
-        <button class="btn-next" id="crNext">Got it →</button>
       `;
     } else {
       fb.className = 'cr-feedback cr-feedback--skipped';
