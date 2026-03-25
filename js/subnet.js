@@ -1927,12 +1927,13 @@
 
   // ── Top-level Render ──────────────────────────────────────────────────────
 
+  let hideTabs = false;
+
   function render() {
     const panel = document.getElementById('tool-subnet-calc');
     if (!panel) return;
 
-    panel.innerHTML = `
-      <div class="sn-wrapper">
+    const tabsHtml = hideTabs ? '' : `
         <div class="sn-mode-tabs" id="snModeTabs">
           <button class="sn-tab ${currentMode === 'info'       ? 'active' : ''}" data-mode="info">Network Info</button>
           <button class="sn-tab ${currentMode === 'splitter'   ? 'active' : ''}" data-mode="splitter">Subnet Splitter</button>
@@ -1940,7 +1941,11 @@
           <button class="sn-tab ${currentMode === 'drill'      ? 'active' : ''}" data-mode="drill">Octet Drill</button>
           <button class="sn-tab ${currentMode === 'tnlogic'   ? 'active' : ''}" data-mode="tnlogic">2&#x207F; Logic</button>
           <button class="sn-tab ${currentMode === 'divmethod' ? 'active' : ''}" data-mode="divmethod">Division Method</button>
-        </div>
+        </div>`;
+
+    panel.innerHTML = `
+      <div class="sn-wrapper">
+        ${tabsHtml}
         <div class="sn-content" id="snContent"></div>
       </div>
     `;
@@ -1948,14 +1953,16 @@
     const tabs    = panel.querySelector('#snModeTabs');
     const content = panel.querySelector('#snContent');
 
-    tabs.addEventListener('click', e => {
-      const btn = e.target.closest('.sn-tab');
-      if (!btn) return;
-      tabs.querySelectorAll('.sn-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentMode = btn.dataset.mode;
-      renderContent(content);
-    });
+    if (tabs) {
+      tabs.addEventListener('click', e => {
+        const btn = e.target.closest('.sn-tab');
+        if (!btn) return;
+        tabs.querySelectorAll('.sn-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        renderContent(content);
+      });
+    }
 
     renderContent(content);
   }
@@ -1974,11 +1981,17 @@
 
   window.SubnetCalc = {
     init (mode) {
-      if (mode) currentMode = mode;
+      if (mode) {
+        currentMode = mode;
+        hideTabs = true;
+      } else {
+        hideTabs = false;
+      }
       render();
     },
     startMode (mode) {
       currentMode = mode;
+      hideTabs = false;
       render();
     },
   };
