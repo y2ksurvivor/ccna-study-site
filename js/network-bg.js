@@ -7,7 +7,7 @@
 
   const NODE_COUNT      = 14;
   const CONNECT_RATIO   = 0.32;
-  const PACKET_INTERVAL = 1200;
+  const PACKET_INTERVAL = 2000;
   const LABELS = ['R1','R2','R3','R4','SW1','SW2','SW3','FW','ISP','Core','Dist','Edge','WAN','LAN'];
 
   let canvas, ctx, nodes, packets, raf, panel, lastPacket = 0, frameTs = 0;
@@ -42,8 +42,8 @@
     nodes = LABELS.slice(0, NODE_COUNT).map((label, i) => ({
       x:     m + Math.random() * (canvas.width  - m * 2),
       y:     m + Math.random() * (canvas.height - m * 2),
-      vx:    (Math.random() - 0.5) * 0.35,
-      vy:    (Math.random() - 0.5) * 0.35,
+      vx:    (Math.random() - 0.5) * 0.2,
+      vy:    (Math.random() - 0.5) * 0.2,
       r:     i < 3 ? 12 : 7 + Math.random() * 4,
       pulse: Math.random() * Math.PI * 2,
       label,
@@ -68,7 +68,7 @@
     if (!edges.length) return;
     const e = edges[Math.floor(Math.random() * edges.length)];
     const flip = Math.random() > 0.5;
-    packets.push({ a: flip ? e.b : e.a, b: flip ? e.a : e.b, t: 0, speed: 0.003 + Math.random() * 0.003 });
+    packets.push({ a: flip ? e.b : e.a, b: flip ? e.a : e.b, t: 0, speed: 0.0015 + Math.random() * 0.002 });
   }
 
   function draw (ts) {
@@ -93,7 +93,7 @@
     // Edges
     for (const e of edges) {
       const a = nodes[e.a], b = nodes[e.b];
-      ctx.strokeStyle = 'rgba(0,194,255,0.08)';
+      ctx.strokeStyle = 'rgba(0,194,255,0.06)';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }

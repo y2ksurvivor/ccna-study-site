@@ -19,7 +19,7 @@
 
   const FONT_SIZE  = 13;
   const COL_WIDTH  = 72;
-  const SPEED      = 3; // advance drops every N frames (higher = slower)
+  const SPEED      = 6; // advance drops every N frames (higher = slower)
 
   let canvas, ctx, cols, drops, animFrame, panel, frameCount = 0;
 
@@ -70,12 +70,12 @@
 
       // Bright head character
       ctx.font      = `bold ${FONT_SIZE}px 'Cascadia Code', 'Fira Code', monospace`;
-      ctx.fillStyle = '#00ff88';
+      ctx.fillStyle = 'rgba(0, 255, 136, 0.45)';
       ctx.fillText(word, x, y);
 
       // Dim trail one step above
       ctx.font      = `${FONT_SIZE}px 'Cascadia Code', 'Fira Code', monospace`;
-      ctx.fillStyle = 'rgba(0, 200, 100, 0.35)';
+      ctx.fillStyle = 'rgba(0, 200, 100, 0.15)';
       const prev = WORDS[Math.floor(Math.random() * WORDS.length)];
       ctx.fillText(prev, x, y - (FONT_SIZE + 8));
 
