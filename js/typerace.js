@@ -324,14 +324,26 @@
               <path d="M1 4v6h6M23 20v-6h-6"/>
               <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
             </svg>
-            Play Again
+            New Session
           </button>
+          <button class="btn-skip" id="crRepeat" style="padding:12px 24px;">↺ Repeat</button>
           <button class="btn-skip" id="crSetup" style="padding:12px 24px;">← Setup</button>
         </div>
       </div>
     `;
 
+    const savedSession = state.session.slice();
     el('crAgain').addEventListener('click', startSession);
+    el('crRepeat').addEventListener('click', () => {
+      state.session    = savedSession;
+      state.currentIdx = 0;
+      state.correct    = 0;
+      state.incorrect  = 0;
+      state.skips      = 0;
+      state.streak     = 0;
+      state.maxStreak  = 0;
+      renderQuestion();
+    });
     el('crSetup').addEventListener('click', renderSetup);
   }
 
