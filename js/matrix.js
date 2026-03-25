@@ -19,8 +19,9 @@
 
   const FONT_SIZE  = 13;
   const COL_WIDTH  = 72;
+  const SPEED      = 3; // advance drops every N frames (higher = slower)
 
-  let canvas, ctx, cols, drops, animFrame, panel;
+  let canvas, ctx, cols, drops, animFrame, panel, frameCount = 0;
 
   function init (targetPanel) {
     panel = targetPanel;
@@ -50,9 +51,17 @@
   }
 
   function draw () {
-    // Fade previous frame
-    ctx.fillStyle = 'rgba(15, 17, 23, 0.06)';
+    frameCount++;
+
+    // Fade previous frame every tick for smooth trail
+    ctx.fillStyle = 'rgba(15, 17, 23, 0.04)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Only advance drops every SPEED frames
+    if (frameCount % SPEED !== 0) {
+      animFrame = requestAnimationFrame(draw);
+      return;
+    }
 
     for (let i = 0; i < cols; i++) {
       const word = WORDS[Math.floor(Math.random() * WORDS.length)];
