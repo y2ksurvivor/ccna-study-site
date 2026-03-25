@@ -342,15 +342,18 @@
       'acl-builder':   'ACL Builder',
       'subnet-calc':   'Subnet Calculator',
       'puzzle':        'Command Puzzle',
+      'flackbox':      'Flackbox Deck',
     };
 
     // Per-mode title overrides (take precedence over toolTitles)
     const modeTitles = {
-      'flashcard':  'Flashcards',
-      'quiz':       'Quiz Mode',
-      'drill':      'Octet Drill',
-      'tnlogic':    '2\u207F Logic',
-      'divmethod':  'Division Method',
+      'flashcard':    'Flashcards',
+      'quiz':         'Quiz Mode',
+      'drill':        'Octet Drill',
+      'tnlogic':      '2\u207F Logic',
+      'divmethod':    'Division Method',
+      'fb-flashcard': 'Flashcards (Flackbox)',
+      'fb-quiz':      'Quiz (Flackbox)',
     };
 
     navItems.forEach(item => {
@@ -399,6 +402,8 @@
             topbarMeta.innerHTML = `<span class="stat-chip">IPv4 Only</span>`;
           } else if (tool === 'puzzle') {
             topbarMeta.innerHTML = `<span class="stat-chip">${PUZZLES.length} questions</span>`;
+          } else if (tool === 'flackbox') {
+            topbarMeta.innerHTML = `<span class="stat-chip">${FLACKBOX_CARDS.length} cards</span>`;
           } else {
             topbarMeta.innerHTML = '';
           }
@@ -429,6 +434,11 @@
         // Activate Study Site
         if (tool === 'puzzle' && window.PuzzleGame) {
           window.PuzzleGame.init();
+        }
+
+        // Activate Flackbox Deck
+        if (tool === 'flackbox' && window.FlackboxEngine) {
+          window.FlackboxEngine.startMode(mode);
         }
       });
     });
