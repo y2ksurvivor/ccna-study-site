@@ -38,6 +38,12 @@
 
   // ── Init — shows category picker ─────────────────────────────────────────────
   function init () {
+    // Set up a persistent content wrapper so NetworkBg canvas is never clobbered
+    if (!PANEL.querySelector('.pz-content')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pz-content';
+      PANEL.appendChild(wrapper);
+    }
     if (window.NetworkBg) window.NetworkBg.init(PANEL);
     renderCategoryPicker();
   }
@@ -129,17 +135,17 @@
     }
   }
 
+  function getContent () {
+    return PANEL.querySelector('.pz-content') || PANEL;
+  }
+
   // ── Category Picker ───────────────────────────────────────────────────────────
   function renderCategoryPicker () {
-    // Build category counts
     const counts = {};
     for (const p of PUZZLES) {
       counts[p.category] = (counts[p.category] || 0) + 1;
     }
-
-    // Sort by count desc
     const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-
     const catsHtml = cats.map(([cat, count]) => `
       <button class="pz-cat-btn" data-cat="${cat}">
         <span class="pz-cat-name">${esc(CAT_LABELS[cat] || cat)}</span>
@@ -147,30 +153,25 @@
       </button>
     `).join('');
 
-    PANEL.innerHTML = `
+    getContent().innerHTML = `
       <div class="pz-container">
         <div class="pz-header">
           <h2 class="pz-title">Command Puzzle</h2>
           <span class="stat-chip">${PUZZLES.length} questions</span>
         </div>
-
         <div class="pz-picker-intro">
           <div class="pz-scenario-label">Choose a Category</div>
           <p class="pz-scenario-text">Select a topic to practice, or test yourself across all categories.</p>
         </div>
-
         <button class="pz-cat-btn pz-cat-btn--all" data-cat="all">
           <span class="pz-cat-name">All Categories</span>
           <span class="pz-cat-count">${PUZZLES.length} questions</span>
         </button>
-
-        <div class="pz-cat-grid">
-          ${catsHtml}
-        </div>
+        <div class="pz-cat-grid">${catsHtml}</div>
       </div>
     `;
 
-    PANEL.querySelectorAll('.pz-cat-btn').forEach(btn => {
+    getContent().querySelectorAll('.pz-cat-btn').forEach(btn => {
       btn.addEventListener('click', () => startGame(btn.dataset.cat));
     });
   }
@@ -242,7 +243,7 @@
       `;
     }
 
-    PANEL.innerHTML = `
+    getContent().innerHTML = `
       <div class="pz-container">
 
         <div class="pz-header">
@@ -269,9 +270,10 @@
     `;
 
     // Events
-    const inputEl  = PANEL.querySelector('#puzzleInput');
-    const submitEl = PANEL.querySelector('#puzzleSubmit');
-    const newEl    = PANEL.querySelector('#puzzleNew');
+    const content  = getContent();
+    const inputEl  = content.querySelector('#puzzleInput');
+    const submitEl = content.querySelector('#puzzleSubmit');
+    const newEl    = content.querySelector('#puzzleNew');
 
     if (inputEl) {
       inputEl.focus();
@@ -280,19 +282,12 @@
       });
     }
     if (submitEl) submitEl.addEventListener('click', () => {
-      const el = PANEL.querySelector('#puzzleInput');
+      const el = content.querySelector('#puzzleInput');
       if (el) submitGuess(el.value);
     });
     if (newEl) newEl.addEventListener('click', () => startGame(selectedCategory));
-    const changeCatEl = PANEL.querySelector('#puzzleChangeCat');
+    const changeCatEl = content.querySelector('#puzzleChangeCat');
     if (changeCatEl) changeCatEl.addEventListener('click', renderCategoryPicker);
-
-    // Show current category in header subtitle
-    const header = PANEL.querySelector('.pz-header');
-    if (header && selectedCategory !== 'all') {
-      const chip = header.querySelector('.stat-chip');
-      if (chip) chip.title = `Filtering: ${CAT_LABELS[selectedCategory] || selectedCategory}`;
-    }
   }
 
   function esc (str) {

@@ -158,12 +158,12 @@
   function dismiss () {
     if (dismissed) return;
     dismissed = true;
-    cancelAnimationFrame(raf);
-    window.removeEventListener('resize', resize);
     document.removeEventListener('keydown', dismiss);
     splash.removeEventListener('click', dismiss);
     splash.classList.add('splash--out');
     setTimeout(() => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
       splash.style.display = 'none';
       if (window.PuzzleGame) window.PuzzleGame.init();
     }, 900);
