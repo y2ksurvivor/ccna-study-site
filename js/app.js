@@ -374,7 +374,7 @@
         });
 
         // Update topbar title
-        const modeTitleMap = { 'drill': 'Octet Drill', 'tnlogic': '2\u207F Logic' };
+        const modeTitleMap = { 'drill': 'Octet Drill', 'tnlogic': '2\u207F Logic', 'divmethod': 'Division Method' };
         const titleKey = tool;
         const toolTitlesExt = Object.assign({}, toolTitles);
         if (tool === 'subnet-calc' && mode && modeTitleMap[mode]) {
