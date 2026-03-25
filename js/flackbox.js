@@ -597,11 +597,6 @@
     init: renderSetup,
     startMode: function (mode) {
       renderSetup();
-      if (mode === 'fb-flashcard') {
-        setTimeout(startFlashcards, 50);
-      } else if (mode === 'fb-quiz') {
-        setTimeout(startQuiz, 50);
-      }
     },
   };
 
