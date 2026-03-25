@@ -341,7 +341,7 @@
       'study':         'Study Center',
       'acl-builder':   'ACL Builder & Explainer',
       'subnet-calc':   'Subnet Calculator',
-      'puzzle':        'Command Puzzle',
+      'puzzle':        'Study Site',
     };
 
     navItems.forEach(item => {
@@ -412,7 +412,7 @@
           window.SubnetCalc.init();
         }
 
-        // Activate Command Puzzle
+        // Activate Study Site
         if (tool === 'puzzle' && window.PuzzleGame) {
           window.PuzzleGame.init();
         } else if (window.NetworkBg) {

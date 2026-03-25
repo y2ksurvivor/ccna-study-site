@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  CCNA Command Puzzle — Fill in the Blank
+//  CCNA Study Site — Fill in the Blank
 // ─────────────────────────────────────────────────────────────────────────────
 
 (function () {
@@ -170,7 +170,7 @@
       <div class="pz-container">
 
         <div class="pz-header">
-          <h2 class="pz-title">Command Puzzle</h2>
+          <h2 class="pz-title">Study Site</h2>
           <span class="stat-chip">${remaining} attempt${remaining !== 1 ? 's' : ''} left</span>
         </div>
 
