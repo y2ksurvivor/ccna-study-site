@@ -166,7 +166,7 @@
         </div>
 
         <div class="cr-action-row">
-          <button class="btn-skip" id="crSkip">Skip</button>
+          <button class="btn-skip" id="crSkip">Skip &amp; Show Answer</button>
           <button class="cr-hint-btn" id="crHint">Show Hint</button>
         </div>
 
