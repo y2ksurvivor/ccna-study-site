@@ -338,7 +338,7 @@
 
     const toolTitles = {
       'ios-reference': 'IOS Command Ref',
-      'study':         'Study Center',
+      'study':         'AI Study Deck',
       'acl-builder':   'ACL Builder',
       'subnet-calc':   'Subnet Calculator',
       'puzzle':        'Commands',
@@ -348,13 +348,9 @@
 
     // Per-mode title overrides (take precedence over toolTitles)
     const modeTitles = {
-      'flashcard':    'Flashcards',
-      'quiz':         'Quiz Mode',
-      'drill':        'Octet Drill',
-      'tnlogic':      '2\u207F Logic',
-      'divmethod':    'Division Method',
-      'fb-flashcard': 'Flashcards (Flackbox)',
-      'fb-quiz':      'Quiz (Flackbox)',
+      'drill':     'Octet Drill',
+      'tnlogic':   '2\u207F Logic',
+      'divmethod': 'Division Method',
     };
 
     navItems.forEach(item => {
@@ -417,11 +413,7 @@
 
         // Activate quiz/flashcard engine for study panel
         if (tool === 'study' && window.QuizEngine) {
-          if (mode) {
-            window.QuizEngine.startMode(mode);
-          } else {
-            window.QuizEngine.init();
-          }
+          window.QuizEngine.init();
         }
 
         // Activate ACL Builder
