@@ -20,7 +20,8 @@
     commands:   [],
     currentIdx: 0,
     currentPos: 0,
-    hasError:   false,
+    hasError:      false,
+    awaitingEnter: false,
     startTime:  null,
     paused:     false,
     done:       false,
@@ -171,7 +172,8 @@
       commands:  pool.map(p => p.answer.trim()),
       currentIdx: 0,
       currentPos: 0,
-      hasError:   false,
+      hasError:      false,
+      awaitingEnter: false,
       startTime:  null,
       paused:     false,
       done:       false,
@@ -267,7 +269,9 @@
       if (i === state.currentPos)   return `<span class="tr-ch ${state.hasError ? 'tr-ch-error' : 'tr-ch-cursor'}">${d}</span>`;
       return `<span class="tr-ch tr-ch-pending">${d}</span>`;
     }).join('');
-    return promptSpan + chars;
+    const enterHint = state.awaitingEnter
+      ? `<span class="tr-enter-hint">↵ Enter</span>` : '';
+    return promptSpan + chars + enterHint;
   }
 
   function buildCompletedCmdHTML (puzzle) {
@@ -285,6 +289,16 @@
     if (state.paused || state.done) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'Tab') { e.preventDefault(); return; }
+
+    // Waiting for Enter to confirm completed command
+    if (state.awaitingEnter) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        state.awaitingEnter = false;
+        commitCommand();
+      }
+      return;
+    }
 
     const cmd = state.commands[state.currentIdx];
     if (!cmd) return;
@@ -310,25 +324,9 @@
       state.currentPos++;
 
       if (state.currentPos >= cmd.length) {
-        // Command complete
-        state.totalCharsCompleted += cmd.length;
-        const justFinishedIdx = state.currentIdx;
-        state.currentIdx++;
-        state.currentPos = 0;
-        state.hasError   = false;
-
+        // All chars correct — wait for Enter
+        state.awaitingEnter = true;
         refreshDisplay();
-
-        if (state.currentIdx >= state.commands.length) {
-          // Race done
-          state.playerFinishTime = Date.now() - state.startTime;
-          clearInterval(state.statsTimer);
-          clearInterval(state.oppTimer);
-          setTimeout(finishRace, 300);
-        } else {
-          // Show explanation then continue
-          showExplanation(justFinishedIdx);
-        }
         return;
       }
     } else {
@@ -339,6 +337,26 @@
     }
 
     refreshDisplay();
+  }
+
+  // ── Commit completed command ──────────────────────────────
+  function commitCommand () {
+    const justFinishedIdx = state.currentIdx;
+    state.totalCharsCompleted += state.commands[justFinishedIdx].length;
+    state.currentIdx++;
+    state.currentPos = 0;
+    state.hasError   = false;
+
+    refreshDisplay();
+
+    if (state.currentIdx >= state.commands.length) {
+      state.playerFinishTime = Date.now() - state.startTime;
+      clearInterval(state.statsTimer);
+      clearInterval(state.oppTimer);
+      setTimeout(finishRace, 300);
+    } else {
+      showExplanation(justFinishedIdx);
+    }
   }
 
   // ── Explanation pause ─────────────────────────────────────
@@ -400,6 +418,7 @@
     state.oppTimer = setInterval(tickOpponents, 100);
 
     // Re-focus input
+    state.awaitingEnter = false;
     const input = el('trInput');
     if (input) { input.value = ''; input.focus(); }
   }

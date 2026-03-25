@@ -242,6 +242,21 @@
 /* Characters */
 .tr-ch { display: inline; }
 .tr-ch-prompt  { color: #4ade80; font-weight: 600; user-select: none; }
+.tr-enter-hint {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1px 8px;
+  vertical-align: middle;
+  animation: tr-blink 0.9s step-end infinite;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
 .tr-ch-pending { color: var(--text-muted); }
 .tr-ch-correct { color: var(--text-primary); }
 .tr-ch-cursor {
