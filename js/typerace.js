@@ -168,6 +168,7 @@
         <div class="cr-action-row">
           <button class="btn-skip" id="crSkip">Skip &amp; Show Answer</button>
           <button class="cr-hint-btn" id="crHint">Show Hint</button>
+          <span class="cr-tab-note">press <kbd>Tab</kbd> for a hint</span>
         </div>
 
         <div class="cr-feedback" id="crFeedback" style="display:none"></div>
@@ -179,6 +180,11 @@
     input.focus();
 
     input.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (!state.answered) el('crHint').click();
+        return;
+      }
       if (e.key !== 'Enter') return;
       e.preventDefault();
       if (state.answered) { advance(); return; }

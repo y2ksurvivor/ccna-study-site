@@ -92,7 +92,23 @@
 /* ── Action row (skip + hint) ────────────────────────────── */
 .cr-action-row {
   display: flex;
+  align-items: center;
   gap: 10px;
+}
+.cr-tab-note {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.cr-tab-note kbd {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
 }
 .cr-action-row .btn-skip {
   color: var(--text-secondary);
