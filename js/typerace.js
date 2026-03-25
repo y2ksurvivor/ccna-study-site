@@ -206,6 +206,7 @@
         ? revealed + ' …'
         : revealed;
       btn.classList.add('cr-hint-btn--revealed');
+      el('crInput').focus();
     });
   }
 
