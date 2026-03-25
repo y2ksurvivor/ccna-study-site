@@ -471,6 +471,7 @@
           </div>
         </div>
         <div class="quiz-nav">
+          <button class="btn-skip" id="fbBtnSkip">Skip</button>
           <button class="btn-next" id="fbBtnNext" disabled>
             ${idx + 1 < total ? 'Next Question →' : 'See Results →'}
           </button>
@@ -487,6 +488,11 @@
     el('fbExplainToggle').addEventListener('click', () => el('fbExplainBox').classList.toggle('open'));
     el('fbQzBack').addEventListener('click', renderSetup);
     el('fbBtnNext').addEventListener('click', () => { state.currentIndex++; renderQuizQuestion(); });
+    el('fbBtnSkip').addEventListener('click', () => {
+      if (state.answered) return;
+      state.currentIndex++;
+      renderQuizQuestion();
+    });
   }
 
   function handleQuizAnswer (card, chosenIdx) {

@@ -542,6 +542,7 @@
 
         <!-- Next button -->
         <div class="quiz-nav">
+          <button class="btn-skip" id="btnSkip">Skip</button>
           <button class="btn-next" id="btnNext" disabled>
             ${idx + 1 < total ? 'Next Question →' : 'See Results →'}
           </button>
@@ -565,6 +566,11 @@
 
     el('qzBackBtn').addEventListener('click', renderSetup);
     el('btnNext').addEventListener('click', () => {
+      state.currentIndex++;
+      renderQuizQuestion();
+    });
+    el('btnSkip').addEventListener('click', () => {
+      if (state.answered) return;
       state.currentIndex++;
       renderQuizQuestion();
     });
