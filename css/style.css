@@ -284,6 +284,7 @@ input, button { outline: none; border: none; }
 }
 .nav-item.active svg { color: var(--accent); }
 .nav-item.disabled { opacity: 0.4; cursor: not-allowed; }
+.nav-ai-badge { font-size: 9px; opacity: 0.55; font-weight: 400; letter-spacing: 0.02em; }
 
 .badge-soon {
   margin-left: auto;
