@@ -40,8 +40,20 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  const PROMPTS = {
+    'exec':                   'Router#',
+    'config':                 'Router(config)#',
+    'config-if':              'Router(config-if)#',
+    'config-router':          'Router(config-router)#',
+    'config-line':            'Router(config-line)#',
+    'dhcp-config':            'Router(dhcp-config)#',
+    'switch-config':          'Switch(config)#',
+    'switch-config-if':       'Switch(config-if)#',
+    'switch-config-if-range': 'Switch(config-if-range)#',
+  };
+
   function promptFor (p) {
-    return p.mode === 'config' ? 'Router(config)#' : 'Router#';
+    return PROMPTS[p.mode] || 'Router#';
   }
 
   function getSections () {
