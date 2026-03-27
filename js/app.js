@@ -402,7 +402,7 @@
           } else if (tool === 'flackbox') {
             topbarMeta.innerHTML = `<span class="stat-chip">${FLACKBOX_CARDS.length} cards</span>`;
           } else if (tool === 'typerace') {
-            topbarMeta.innerHTML = `<span class="stat-chip">Type to race</span>`;
+            topbarMeta.innerHTML = `<span class="stat-chip">${PUZZLES.length} commands</span>`;
           } else {
             topbarMeta.innerHTML = '';
           }
