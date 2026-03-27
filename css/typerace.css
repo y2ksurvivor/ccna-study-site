@@ -67,6 +67,17 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
+.cr-input-row.cr-retry {
+  border-color: #e05252;
+  box-shadow: 0 0 0 3px rgba(224,82,82,0.15);
+  animation: cr-retry-pulse 0.4s ease;
+}
+@keyframes cr-retry-pulse {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-4px); }
+  75%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
 .cr-prompt {
   font-family: var(--font-mono);
   font-size: 15px;

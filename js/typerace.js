@@ -250,7 +250,7 @@
       <div class="cr-fb-left">
         <span class="cr-fb-icon">✗</span>
         <div>
-          <div class="cr-fb-status">Not quite — try again:</div>
+          <div class="cr-fb-status">Not quite — correct answer is above. Type it to continue:</div>
           <code class="cr-fb-cmd">${esc(puzzle.answer)}</code>
         </div>
       </div>
@@ -261,8 +261,17 @@
 
     const input = el('crInput');
     input.value = '';
+    input.placeholder = 'type the correct command…';
     input.disabled = false;
-    input.focus();
+
+    const row = input.closest('.cr-input-row');
+    if (row) {
+      row.classList.remove('cr-retry');
+      void row.offsetWidth; // force reflow to restart animation
+      row.classList.add('cr-retry');
+    }
+
+    setTimeout(() => input.focus(), 50);
   }
 
   function showFeedback (puzzle, typed, result) {
