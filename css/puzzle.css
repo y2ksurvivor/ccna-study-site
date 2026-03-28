@@ -332,6 +332,52 @@
   color: var(--accent);
 }
 
+/* ── CLI Sequence ───────────────────────────────────────── */
+.pz-cli-sequence {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pz-cli-terminal {
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pz-cli-line {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  opacity: 0.4;
+}
+
+.pz-cli-line--target {
+  opacity: 1;
+}
+
+.pz-cli-prompt {
+  color: var(--green);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pz-cli-cmd {
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.pz-cli-line--target .pz-cli-cmd {
+  color: var(--green);
+  font-weight: 600;
+}
+
 /* ── Category Picker ───────────────────────────────────── */
 .pz-picker-intro {
   background: var(--bg-surface);

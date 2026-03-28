@@ -84,6 +84,61 @@
     return { idx: 0, word: tokens[0] };
   }
 
+  // ── CLI Sequence Builder ──────────────────────────────────────────────────────
+  // Returns an array of { prompt, cmd, isTarget } for the full engineer sequence
+  function buildCliSequence (puzzle) {
+    const { mode, answer, unit = '' } = puzzle;
+    const isSwitch = mode.startsWith('switch');
+    const d = isSwitch ? 'Switch' : 'Router';
+    const steps = [];
+
+    const nav    = (prompt, cmd) => ({ prompt, cmd, isTarget: false });
+    const target = (prompt, cmd) => ({ prompt, cmd, isTarget: true  });
+
+    if (mode === 'exec') {
+      steps.push(nav(`${d}>`, 'enable'));
+      steps.push(target(`${d}#`, answer));
+      return steps;
+    }
+
+    // All config modes share these two entry steps
+    steps.push(nav(`${d}>`, 'enable'));
+    steps.push(nav(`${d}#`, 'configure terminal'));
+
+    if (mode === 'config' || mode === 'switch-config') {
+      steps.push(target(`${d}(config)#`, answer));
+
+    } else if (mode === 'config-if' || mode === 'switch-config-if') {
+      steps.push(nav(`${d}(config)#`, 'interface GigabitEthernet0/1'));
+      steps.push(target(`${d}(config-if)#`, answer));
+
+    } else if (mode === 'switch-config-if-range') {
+      steps.push(nav(`${d}(config)#`, 'interface range GigabitEthernet0/1-4'));
+      steps.push(target(`${d}(config-if-range)#`, answer));
+
+    } else if (mode === 'config-router') {
+      let routerCmd = 'router ospf 1';
+      if      (/eigrp/i.test(unit) || /eigrp/i.test(answer)) routerCmd = 'router eigrp 100';
+      else if (/rip/i.test(unit))                             routerCmd = 'router rip';
+      else if (/bgp/i.test(unit))                             routerCmd = 'router bgp 65001';
+      steps.push(nav(`${d}(config)#`, routerCmd));
+      steps.push(target(`${d}(config-router)#`, answer));
+
+    } else if (mode === 'config-line') {
+      steps.push(nav(`${d}(config)#`, 'line vty 0 4'));
+      steps.push(target(`${d}(config-line)#`, answer));
+
+    } else if (mode === 'dhcp-config') {
+      steps.push(nav(`${d}(config)#`, 'ip dhcp pool POOL_NAME'));
+      steps.push(target(`${d}(dhcp-config)#`, answer));
+
+    } else {
+      steps.push(target(`${d}(config)#`, answer));
+    }
+
+    return steps;
+  }
+
   // ── Build command display with blank ─────────────────────────────────────────
   function buildCommandDisplay (answer, blankIdx, revealWord) {
     const tokens = answer.split(' ');
@@ -217,12 +272,21 @@
     } else {
       const cls = won ? 'pz-result--win' : 'pz-result--lose';
       const msg = won
-        ? `<strong>Correct!</strong> The full command is:`
-        : `<strong>Not quite.</strong> The answer was:`;
+        ? `<strong>Correct!</strong> Here's the full command sequence:`
+        : `<strong>Not quite.</strong> Here's the full command sequence:`;
+      const seqSteps = buildCliSequence(puzzle);
+      const seqHtml  = seqSteps.map(({ prompt, cmd, isTarget }) => `
+        <div class="pz-cli-line${isTarget ? ' pz-cli-line--target' : ''}">
+          <span class="pz-cli-prompt">${esc(prompt)}</span>
+          <span class="pz-cli-cmd">${esc(cmd)}</span>
+        </div>
+      `).join('');
       bottomHtml = `
         <div class="pz-result ${cls}">
           <div class="pz-result-msg">${msg}</div>
-          <div class="pz-result-cmd">${esc(puzzle.answer)}</div>
+          <div class="pz-cli-sequence">
+            <div class="pz-cli-terminal">${seqHtml}</div>
+          </div>
           <div class="pz-result-actions">
             <button class="pz-new-btn" id="puzzleNew">Next Puzzle →</button>
             <button class="pz-change-cat-btn" id="puzzleChangeCat">Change Category</button>
