@@ -21,6 +21,15 @@
 
   window.PuzzleGame = { init };
 
+  // ── Global Enter key — advance to next puzzle when result is showing ──────────
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    if (!state.gameOver) return;
+    if (PANEL.offsetParent === null) return; // panel not visible
+    e.preventDefault();
+    startGame(selectedSection);
+  });
+
   // ── Init — shows category picker ─────────────────────────────────────────────
   function init () {
     if (!PANEL.querySelector('.pz-content')) {
