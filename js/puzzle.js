@@ -10,6 +10,7 @@
 
   // selectedSection: 'all' or a section number (integer)
   let selectedSection = 'all';
+  let skippedQueue    = [];   // puzzles to re-surface after skipping
 
   let state = {
     puzzle:   null,
@@ -17,6 +18,7 @@
     attempts: [],     // [{ guess, correct }]
     gameOver: false,
     won:      false,
+    skipped:  false,
   };
 
   window.PuzzleGame = { init };
@@ -47,15 +49,30 @@
 
   function startGame (section) {
     selectedSection = section;
-    const pool   = getPool(section);
-    const puzzle = pool[Math.floor(Math.random() * pool.length)];
+    // Prioritise skipped puzzles so they come back immediately
+    let puzzle;
+    if (skippedQueue.length > 0) {
+      puzzle = skippedQueue.shift();
+    } else {
+      const pool = getPool(section);
+      puzzle = pool[Math.floor(Math.random() * pool.length)];
+    }
     state = {
       puzzle,
       blank:    getBlank(puzzle.answer),
       attempts: [],
       gameOver: false,
       won:      false,
+      skipped:  false,
     };
+    render();
+  }
+
+  function skipPuzzle () {
+    if (state.gameOver) return;
+    skippedQueue.push(state.puzzle);   // re-queue it
+    state.gameOver = true;
+    state.skipped  = true;
     render();
   }
 
@@ -230,7 +247,7 @@
 
   // ── Render ────────────────────────────────────────────────────────────────────
   function render () {
-    const { puzzle, blank, attempts, gameOver, won } = state;
+    const { puzzle, blank, attempts, gameOver, won, skipped } = state;
     const remaining = MAX_ATTEMPTS - attempts.length;
     const prompt    = puzzle.mode === 'config' ? 'Router(config)#' : 'Router#';
     const showHint  = !gameOver && attempts.length >= 2;
@@ -268,6 +285,7 @@
             />
             <button class="pz-submit" id="puzzleSubmit">Submit</button>
           </div>
+          <button class="pz-skip-btn" id="puzzleSkip">Skip &amp; Show Answer</button>
         </div>
         <div class="pz-hint${showHint ? ' pz-hint--visible' : ''}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -279,10 +297,12 @@
         </div>
       `;
     } else {
-      const cls = won ? 'pz-result--win' : 'pz-result--lose';
+      const cls = won ? 'pz-result--win' : (skipped ? 'pz-result--skip' : 'pz-result--lose');
       const msg = won
         ? `<strong>Correct!</strong> Here's the full command sequence:`
-        : `<strong>Not quite.</strong> Here's the full command sequence:`;
+        : skipped
+          ? `<strong>No worries.</strong> Study the sequence — it'll come back around:`
+          : `<strong>Not quite.</strong> Here's the full command sequence:`;
       const seqSteps  = buildCliSequence(puzzle);
       const termTitle = puzzle.mode.startsWith('switch') ? 'SW1 — Console' : 'R1 — Console';
       const linesHtml = seqSteps.map(({ prompt, cmd, isTarget }, i) => {
@@ -364,6 +384,8 @@
       if (el) submitGuess(el.value);
     });
     if (newEl) newEl.addEventListener('click', () => startGame(selectedSection));
+    const skipEl = content.querySelector('#puzzleSkip');
+    if (skipEl) skipEl.addEventListener('click', skipPuzzle);
     const changeCatEl = content.querySelector('#puzzleChangeCat');
     if (changeCatEl) changeCatEl.addEventListener('click', renderCategoryPicker);
   }
