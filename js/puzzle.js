@@ -197,7 +197,7 @@
     getContent().innerHTML = `
       <div class="pz-container">
         <div class="pz-header">
-          <h2 class="pz-title">Commands</h2>
+          <h2 class="pz-title">Commands Puzzle</h2>
           <span class="stat-chip">${PUZZLES.length} questions</span>
         </div>
         <div class="pz-picker-intro">
@@ -274,18 +274,32 @@
       const msg = won
         ? `<strong>Correct!</strong> Here's the full command sequence:`
         : `<strong>Not quite.</strong> Here's the full command sequence:`;
-      const seqSteps = buildCliSequence(puzzle);
-      const seqHtml  = seqSteps.map(({ prompt, cmd, isTarget }) => `
-        <div class="pz-cli-line${isTarget ? ' pz-cli-line--target' : ''}">
-          <span class="pz-cli-prompt">${esc(prompt)}</span>
-          <span class="pz-cli-cmd">${esc(cmd)}</span>
-        </div>
-      `).join('');
+      const seqSteps  = buildCliSequence(puzzle);
+      const termTitle = puzzle.mode.startsWith('switch') ? 'SW1 — Console' : 'R1 — Console';
+      const linesHtml = seqSteps.map(({ prompt, cmd, isTarget }, i) => {
+        const cursor = (i === seqSteps.length - 1) ? '<span class="pz-cli-cursor"></span>' : '';
+        return `
+          <div class="pz-cli-line${isTarget ? ' pz-cli-line--target' : ''}">
+            <span class="pz-cli-prompt">${esc(prompt)}</span>
+            <span class="pz-cli-cmd">${esc(cmd)}</span>${cursor}
+          </div>
+        `;
+      }).join('');
       bottomHtml = `
         <div class="pz-result ${cls}">
           <div class="pz-result-msg">${msg}</div>
           <div class="pz-cli-sequence">
-            <div class="pz-cli-terminal">${seqHtml}</div>
+            <div class="pz-cli-terminal">
+              <div class="pz-cli-titlebar">
+                <div class="pz-cli-dots">
+                  <span class="pz-cli-dot pz-cli-dot--red"></span>
+                  <span class="pz-cli-dot pz-cli-dot--yellow"></span>
+                  <span class="pz-cli-dot pz-cli-dot--green"></span>
+                </div>
+                <span class="pz-cli-title">${esc(termTitle)}</span>
+              </div>
+              <div class="pz-cli-lines">${linesHtml}</div>
+            </div>
           </div>
           <div class="pz-result-actions">
             <button class="pz-new-btn" id="puzzleNew">Next Puzzle →</button>
@@ -299,7 +313,7 @@
       <div class="pz-container">
 
         <div class="pz-header">
-          <h2 class="pz-title">Commands</h2>
+          <h2 class="pz-title">Commands Puzzle</h2>
           <div class="pz-header-meta">
             <span class="pz-section-chip">${esc(sectionLabel)}</span>
             <span class="stat-chip">${remaining} attempt${remaining !== 1 ? 's' : ''} left</span>

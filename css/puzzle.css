@@ -332,30 +332,78 @@
   color: var(--accent);
 }
 
-/* ── CLI Sequence ───────────────────────────────────────── */
+/* ── CLI Sequence / Terminal Window ─────────────────────── */
 .pz-cli-sequence {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
 .pz-cli-terminal {
-  background: #0d1117;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  background: #0b0f0b;
+  border: 1px solid rgba(34, 212, 124, 0.2);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(34, 212, 124, 0.06),
+    0 0 28px rgba(34, 212, 124, 0.07),
+    inset 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Title bar */
+.pz-cli-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.pz-cli-dots {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.pz-cli-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  opacity: 0.85;
+}
+
+.pz-cli-dot--red    { background: #ff5f57; }
+.pz-cli-dot--yellow { background: #ffbd2e; }
+.pz-cli-dot--green  { background: #28c840; }
+
+.pz-cli-title {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* Lines area */
+.pz-cli-lines {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pz-cli-line {
   display: flex;
+  align-items: baseline;
   gap: 10px;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.7;
-  opacity: 0.4;
+  font-size: 0.87rem;
+  line-height: 1.75;
+  opacity: 0.35;
 }
 
 .pz-cli-line--target {
@@ -363,19 +411,40 @@
 }
 
 .pz-cli-prompt {
-  color: var(--green);
+  color: #22d47c;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .pz-cli-cmd {
-  color: var(--text-secondary);
+  color: #8b9e8b;
   word-break: break-all;
 }
 
+.pz-cli-line--target .pz-cli-prompt {
+  color: #4fffaa;
+}
+
 .pz-cli-line--target .pz-cli-cmd {
-  color: var(--green);
+  color: #c8ffdc;
   font-weight: 600;
+}
+
+/* Blinking cursor */
+.pz-cli-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 0.9em;
+  background: #4fffaa;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: pz-blink 1.1s step-end infinite;
+}
+
+@keyframes pz-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 /* ── Category Picker ───────────────────────────────────── */
