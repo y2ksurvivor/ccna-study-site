@@ -257,13 +257,15 @@
     const rowsHtml = POW2_ROWS.map(({ bits, subnets, hosts }) => `
       <tr>
         <td class="sm-p2-bits">${bits}</td>
-        <td>
+        <td class="sm-p2-cell">
           <input class="sm-p2-input" data-answer="${subnets}"
             inputmode="numeric" placeholder="?" autocomplete="off" spellcheck="false" />
+          <div class="sm-p2-flyout">2<sup>${bits}</sup></div>
         </td>
-        <td>
+        <td class="sm-p2-cell">
           <input class="sm-p2-input" data-answer="${hosts}"
             inputmode="numeric" placeholder="?" autocomplete="off" spellcheck="false" />
+          <div class="sm-p2-flyout">2<sup>${bits}</sup> − 2</div>
         </td>
       </tr>`).join('');
 

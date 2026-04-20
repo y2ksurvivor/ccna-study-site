@@ -416,6 +416,53 @@
   color: var(--red);
 }
 
+/* Hint flyouts */
+.sm-p2-cell {
+  position: relative;
+}
+
+.sm-p2-flyout {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 5px 11px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Arrow pointing down */
+.sm-p2-flyout::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--accent);
+}
+
+/* Show on hover or focus — but not on locked correct cells */
+.sm-p2-cell:hover .sm-p2-flyout,
+.sm-p2-input:focus + .sm-p2-flyout {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.sm-p2-input.sm-p2-correct + .sm-p2-flyout {
+  display: none;
+}
+
 /* Completion banner */
 .sm-p2-complete {
   display: flex;
