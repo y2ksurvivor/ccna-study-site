@@ -1,0 +1,444 @@
+/* ─────────────────────────────────────────────────────────
+   Subnet Methods — Block Size & Powers of 2 Drills
+   ───────────────────────────────────────────────────────── */
+
+.sm-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sm-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.sm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sm-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sm-back-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sm-back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Menu ───────────────────────────────────────────────── */
+.sm-intro {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.sm-mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.sm-mode-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sm-mode-btn:hover {
+  border-color: var(--accent);
+  background: rgba(0, 194, 255, 0.04);
+}
+
+.sm-mode-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.sm-mode-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sm-mode-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Question Card ──────────────────────────────────────── */
+.sm-q-card {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sm-q-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.sm-q-ip {
+  font-family: var(--font-mono);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.sm-q-prefix { color: var(--accent); }
+
+.sm-q-mask {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Progress Steps ─────────────────────────────────────── */
+.sm-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sm-prog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
+
+.sm-prog-row--done {
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 212, 124, 0.2);
+}
+
+.sm-prog-row--active {
+  background: rgba(0, 194, 255, 0.07);
+  border: 1px solid rgba(0, 194, 255, 0.3);
+}
+
+.sm-prog-row--pending {
+  background: transparent;
+  border: 1px solid transparent;
+  opacity: 0.35;
+}
+
+.sm-prog-label { color: var(--text-secondary); font-weight: 500; }
+.sm-prog-row--done   .sm-prog-label { color: var(--green); }
+.sm-prog-row--active .sm-prog-label { color: var(--accent); font-weight: 600; }
+
+.sm-prog-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--green);
+}
+.sm-prog-val--blank { color: var(--accent); }
+.sm-prog-val--dot   { color: var(--border); font-weight: 400; }
+
+/* ── Input Area ─────────────────────────────────────────── */
+.sm-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sm-input-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sm-input-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.sm-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.sm-input {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  outline: none;
+  caret-color: var(--accent);
+  transition: border-color 0.15s;
+}
+.sm-input:focus { border-color: var(--accent); }
+.sm-input::placeholder { color: var(--text-muted); }
+
+.sm-submit-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 22px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.sm-submit-btn:hover { background: var(--accent-hover); }
+
+.sm-feedback { min-height: 20px; font-size: 0.82rem; }
+.sm-feedback--wrong { color: var(--red); }
+
+@keyframes sm-shake {
+  0%, 100% { transform: translateX(0);   }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px);  }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px);  }
+}
+.sm-shake { animation: sm-shake 0.35s ease; }
+
+/* ── Result ─────────────────────────────────────────────── */
+.sm-result-card {
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sm-result-card--win {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+}
+
+.sm-result-msg {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.sm-summary { display: flex; flex-direction: column; gap: 6px; }
+
+.sm-sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
+
+.sm-sum-label { color: var(--text-secondary); }
+.sm-sum-val   { font-family: var(--font-mono); color: var(--green); font-weight: 600; }
+
+.sm-result-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sm-new-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sm-new-btn:hover { background: var(--accent-hover); }
+
+.sm-sec-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sm-sec-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Powers of 2 ────────────────────────────────────────── */
+.sm-p2-intro {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sm-p2-best {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(0, 194, 255, 0.08);
+  border: 1px solid rgba(0, 194, 255, 0.2);
+  padding: 2px 9px;
+  border-radius: 20px;
+}
+
+.sm-p2-stats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sm-p2-timer {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.sm-p2-prog {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Table */
+.sm-p2-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sm-p2-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.sm-p2-table th {
+  padding: 10px 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: center;
+}
+
+.sm-p2-table th small {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.sm-p2-table td {
+  text-align: center;
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.sm-p2-bits {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  width: 60px;
+}
+
+.sm-p2-input {
+  width: 84px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 9px 6px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  caret-color: var(--accent);
+}
+.sm-p2-input:focus          { border-color: var(--accent); }
+.sm-p2-input::placeholder   { color: var(--text-muted); opacity: 0.4; }
+
+.sm-p2-input.sm-p2-correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.sm-p2-input.sm-p2-wrong {
+  border-color: rgba(248, 113, 113, 0.6);
+  background: rgba(248, 113, 113, 0.07);
+  color: var(--red);
+}
+
+/* Completion banner */
+.sm-p2-complete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .sm-mode-grid     { grid-template-columns: 1fr; }
+  .sm-q-ip          { font-size: 1.25rem; }
+  .sm-p2-timer      { font-size: 1.5rem; }
+  .sm-input-row     { flex-direction: column; }
+  .sm-submit-btn    { width: 100%; padding: 12px; }
+  .sm-result-actions { flex-direction: column; }
+  .sm-sec-btn       { text-align: center; }
+  .sm-p2-complete   { flex-direction: column; align-items: flex-start; }
+}

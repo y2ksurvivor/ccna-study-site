@@ -397,6 +397,8 @@
             topbarMeta.innerHTML = `<span class="stat-chip">Builder &amp; Explainer</span>`;
           } else if (tool === 'subnet-calc') {
             topbarMeta.innerHTML = `<span class="stat-chip">IPv4 Only</span>`;
+          } else if (tool === 'subnet-methods') {
+            topbarMeta.innerHTML = `<span class="stat-chip">Block Size &amp; Powers of 2</span>`;
           } else if (tool === 'puzzle') {
             topbarMeta.innerHTML = `<span class="stat-chip">${PUZZLES.length} questions</span>`;
           } else if (tool === 'flackbox') {
@@ -424,6 +426,11 @@
         // Activate Subnet Calculator (pass mode if present, e.g. 'drill')
         if (tool === 'subnet-calc' && window.SubnetCalc) {
           window.SubnetCalc.init(mode || undefined);
+        }
+
+        // Activate Subnet Methods
+        if (tool === 'subnet-methods' && window.SubnetMethods) {
+          window.SubnetMethods.init();
         }
 
         // Activate Study Site
