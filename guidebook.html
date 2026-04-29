@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Layer8 CCNA Study Site — Guidebook</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --green:   #22d47c;
+      --accent:  #00c2ff;
+      --yellow:  #fbbf24;
+      --text:    #1a1a2e;
+      --muted:   #555;
+      --border:  #e2e8f0;
+      --bg-code: #f0f4f8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.7;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* Cover */
+    .cover {
+      text-align: center;
+      padding: 60px 0 50px;
+      border-bottom: 3px solid var(--green);
+      margin-bottom: 56px;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: #0a0f1e;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,194,255,0.35);
+      margin-bottom: 22px;
+    }
+
+    .cover h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .cover h1 span { color: var(--green); }
+
+    .cover-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    .cover-meta {
+      font-size: 0.8rem;
+      color: #999;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* TOC */
+    .toc {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 56px;
+    }
+
+    .toc h2 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .toc-section { margin-bottom: 12px; }
+
+    .toc-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+      padding: 0;
+    }
+
+    .toc ol li {
+      counter-increment: toc;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 0.9rem;
+      padding: 3px 0;
+    }
+
+    .toc ol li::before {
+      content: counter(toc, decimal-leading-zero);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #bbb;
+      flex-shrink: 0;
+    }
+
+    .toc ol li a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .toc ol li a:hover { color: var(--green); }
+
+    /* Sections */
+    .section {
+      margin-bottom: 60px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .section-tagline {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 24px 0 10px;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 14px; }
+
+    ul, ol {
+      padding-left: 20px;
+      margin-bottom: 14px;
+    }
+
+    li { margin-bottom: 5px; }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82em;
+      background: var(--bg-code);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: #1a1a2e;
+    }
+
+    /* Key callout */
+    .key-box {
+      background: #f0fdf4;
+      border: 1px solid rgba(34,212,124,0.3);
+      border-left: 4px solid var(--green);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+
+    .key-box strong { color: #15803d; }
+
+    .tip-box {
+      background: #fffbeb;
+      border: 1px solid rgba(251,191,36,0.35);
+      border-left: 4px solid var(--yellow);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+
+    .tip-box strong { color: #92400e; }
+
+    /* Step list */
+    .steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: steps;
+      margin-bottom: 14px;
+    }
+    .steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: 14px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+    .steps li::before {
+      content: counter(steps);
+      background: var(--text);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Keyboard shortcut pills */
+    kbd {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-bottom: 2px solid #94a3b8;
+      border-radius: 4px;
+      padding: 1px 7px;
+      color: #334155;
+    }
+
+    /* Mode cards */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .mode-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .mode-card-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .mode-card-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .mode-card p {
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Tool pill */
+    .tool-pill {
+      display: inline-block;
+      background: #0a0f1e;
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(34,212,124,0.3);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* Intro overview table */
+    .overview-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 0.88rem;
+    }
+
+    .overview-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .overview-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .overview-table tr:last-child td { border-bottom: none; }
+
+    .tag-study   { color: var(--green);  font-weight: 600; }
+    .tag-practice { color: var(--accent); font-weight: 600; }
+    .tag-tools   { color: var(--yellow); font-weight: 600; }
+
+    /* Print */
+    @media print {
+      body { padding: 20px; font-size: 13px; }
+      .cover { padding: 30px 0 30px; }
+      .section { page-break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 24px 16px 48px; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .cover h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Cover ─────────────────────────────────────────────────── -->
+<div class="cover">
+  <div class="cover-badge">CCNA 200-301</div>
+  <h1>Layer8 <span>Study Site</span><br>Guidebook</h1>
+  <p class="cover-sub">A complete reference for every tool in the dashboard — what it does, how to use it, and how to get the most out of it.</p>
+  <p class="cover-meta">Billy Dunnic — CCNA Study Dashboard</p>
+</div>
+
+<!-- ── Table of Contents ─────────────────────────────────────── -->
+<div class="toc">
+  <h2>Contents</h2>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Getting Started</div>
+    <ol start="1">
+      <li><a href="#overview">App Overview</a></li>
+      <li><a href="#navigation">Navigation & Layout</a></li>
+    </ol>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Study</div>
+    <ol start="3">
+      <li><a href="#flackbox">Flackbox Deck</a></li>
+      <li><a href="#ai-study">AI Study Deck</a></li>
+    </ol>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Practice</div>
+    <ol start="5">
+      <li><a href="#command-recall">Command Recall</a></li>
+      <li><a href="#subnet-methods">Subnet Methods</a></li>
+      <li><a href="#commands-puzzle">Commands Puzzle</a></li>
+      <li><a href="#octet-drill">Octet Drill</a></li>
+      <li><a href="#pow2-logic">2ⁿ Logic</a></li>
+      <li><a href="#div-method">Division Method</a></li>
+    </ol>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Tools</div>
+    <ol start="11">
+      <li><a href="#ios-ref">IOS Command Ref</a></li>
+      <li><a href="#subnet-calc">Subnet Calculator</a></li>
+      <li><a href="#acl-builder">ACL Builder</a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  GETTING STARTED                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="section" id="overview">
+  <div class="section-label">Getting Started — 01</div>
+  <h2>App Overview</h2>
+  <p class="section-tagline">Thirteen tools organized into three categories: Study, Practice, and Tools.</p>
+
+  <p>The Layer8 CCNA Study Site is a browser-based exam prep dashboard built specifically for the Cisco CCNA 200-301 exam. Everything runs locally in your browser — there's no login, no account, and your progress is saved automatically to your browser's local storage.</p>
+
+  <table class="overview-table">
+    <thead>
+      <tr>
+        <th>Tool</th>
+        <th>Category</th>
+        <th>What it trains</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Flackbox Deck</strong></td><td><span class="tag-study">Study</span></td><td>Concept recall — 589 cards from the official Flackbox CCNA Anki deck</td></tr>
+      <tr><td><strong>AI Study Deck</strong></td><td><span class="tag-study">Study</span></td><td>Multiple-choice questions with explanations, organized by topic and difficulty</td></tr>
+      <tr><td><strong>Command Recall</strong></td><td><span class="tag-practice">Practice</span></td><td>Speed-typing Cisco IOS commands from memory</td></tr>
+      <tr><td><strong>Subnet Methods</strong></td><td><span class="tag-practice">Practice</span></td><td>Block Size drill and Powers of 2 table fill-in</td></tr>
+      <tr><td><strong>Commands Puzzle</strong></td><td><span class="tag-practice">Practice</span></td><td>Fill-in-the-blank IOS command construction</td></tr>
+      <tr><td><strong>Octet Drill</strong></td><td><span class="tag-practice">Practice</span></td><td>Binary octet conversion under pressure</td></tr>
+      <tr><td><strong>2ⁿ Logic</strong></td><td><span class="tag-practice">Practice</span></td><td>Powers of 2 — subnets and hosts calculation</td></tr>
+      <tr><td><strong>Division Method</strong></td><td><span class="tag-practice">Practice</span></td><td>Subnetting using the division / magic number method</td></tr>
+      <tr><td><strong>IOS Command Ref</strong></td><td><span class="tag-tools">Tools</span></td><td>Searchable reference for every major IOS command</td></tr>
+      <tr><td><strong>Subnet Calculator</strong></td><td><span class="tag-tools">Tools</span></td><td>Full IPv4 subnet solver</td></tr>
+      <tr><td><strong>ACL Builder</strong></td><td><span class="tag-tools">Tools</span></td><td>Visual ACL statement builder and explainer</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="navigation">
+  <div class="section-label">Getting Started — 02</div>
+  <h2>Navigation &amp; Layout</h2>
+  <p class="section-tagline">A sidebar on the left, a content area on the right, and a top bar showing where you are.</p>
+
+  <h3>Sidebar</h3>
+  <p>Click any tool in the left sidebar to switch to it. Tools are grouped under <strong>Study</strong>, <strong>Practice</strong>, and <strong>Tools</strong>. The currently active tool is highlighted.</p>
+  <p>On mobile, tap the hamburger icon (top-left) to open and close the sidebar.</p>
+
+  <h3>Top Bar</h3>
+  <p>The top bar shows the current tool name and a metadata chip (e.g. total card count, question count). This updates automatically when you switch tools.</p>
+
+  <h3>Progress is Automatic</h3>
+  <p>All study progress — correct/incorrect counts per card, quiz scores, and best times — is saved to your browser's <code>localStorage</code>. It persists across page refreshes as long as you use the same browser.</p>
+
+  <div class="tip-box">
+    <strong>Tip:</strong> Clearing your browser's site data will reset all progress. If you want a fresh start on a specific deck, use the "Reset" option inside that tool.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  STUDY                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="section" id="flackbox">
+  <div class="section-label">Study — 03</div>
+  <h2>Flackbox Deck</h2>
+  <p class="section-tagline">589 concept flashcards drawn directly from the Flackbox CCNA 200-301 Anki deck, covering Sections 3 through 30.</p>
+
+  <h3>Setup</h3>
+  <p>When you open the Flackbox Deck you land on the setup screen. From here you can:</p>
+  <ul>
+    <li>Select a specific section to drill (e.g. <em>Section 21 – VLANs &amp; Trunking</em>) or leave it on <strong>All Sections</strong>.</li>
+    <li>See your current progress stats — total cards, how many you've answered correctly and incorrectly, and your coverage percentage.</li>
+    <li>Choose between <strong>Flashcard Mode</strong> or <strong>Quiz Mode</strong>.</li>
+  </ul>
+
+  <div class="mode-grid">
+    <div class="mode-card">
+      <div class="mode-card-label">Mode 1</div>
+      <div class="mode-card-name">Flashcard Mode</div>
+      <p>See the question, flip the card to reveal the answer, then mark it as <em>Got It</em> or <em>Review Again</em>. Cards you miss are re-queued at the end of the session.</p>
+    </div>
+    <div class="mode-card">
+      <div class="mode-card-label">Mode 2</div>
+      <div class="mode-card-name">Quiz Mode</div>
+      <p>Four multiple-choice options. Select your answer — correct answers highlight green, wrong answers highlight red and reveal the correct option. Explanation auto-opens on wrong answers.</p>
+    </div>
+  </div>
+
+  <h3>Adaptive Weighting</h3>
+  <p>The deck uses a weighted shuffle — cards you've gotten wrong repeatedly appear more often, cards you've mastered appear less. This means the deck automatically focuses on your weak spots without you having to configure anything.</p>
+
+  <h3>Keyboard Shortcuts</h3>
+  <ul>
+    <li><kbd>Space</kbd> or <kbd>Enter</kbd> — flip the card (Flashcard Mode)</li>
+    <li><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> — select an option (Quiz Mode)</li>
+    <li><kbd>Enter</kbd> — advance to the next card after answering</li>
+  </ul>
+</div>
+
+<div class="section" id="ai-study">
+  <div class="section-label">Study — 04</div>
+  <h2>AI Study Deck</h2>
+  <p class="section-tagline">AI-generated multiple-choice questions with full explanations, covering 18 exam topics at three difficulty levels.</p>
+
+  <h3>Setup Filters</h3>
+  <p>Before starting, you can filter by:</p>
+  <ul>
+    <li><strong>Topic</strong> — OSI, Ports, OSPF, EIGRP, STP, VLANs, Subnetting, NAT/ACLs, BGP, IPv6, Wireless, FHRP, Switch Security, Automation, WAN, and more.</li>
+    <li><strong>Difficulty</strong> — Easy, Medium, or Hard.</li>
+  </ul>
+
+  <p>The setup screen shows how many questions match your current filter, and your historical correct/incorrect ratio for that combination.</p>
+
+  <h3>How Questions Work</h3>
+  <p>Each question includes:</p>
+  <ul>
+    <li>Four answer choices labeled A–D</li>
+    <li>A full <strong>explanation</strong> (shown automatically when you answer wrong, or expandable when correct)</li>
+    <li>A <strong>study tip</strong> or mnemonic where applicable</li>
+    <li>A difficulty indicator dot (green = easy, yellow = medium, red = hard)</li>
+  </ul>
+
+  <h3>Results Breakdown</h3>
+  <p>At the end of each session, you'll see a score circle and a per-topic breakdown table with color-coded bars. Topics below 70% are flagged — use that to decide which section to drill next.</p>
+
+  <div class="key-box">
+    <strong>Study Strategy:</strong> Start with All Topics / Easy. Once you consistently hit 80%+, move to Medium. Use the results breakdown to identify which topics to isolate.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PRACTICE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="section" id="command-recall">
+  <div class="section-label">Practice — 05</div>
+  <h2>Command Recall</h2>
+  <p class="section-tagline">A typing-speed game where you race to type Cisco IOS commands from memory. Think of it as the keyboard version of muscle memory training.</p>
+
+  <h3>How It Works</h3>
+  <ol class="steps">
+    <li>A scenario is shown — e.g. <em>"Save the running config to startup config."</em></li>
+    <li>Type the full command from memory.</li>
+    <li>Each character is checked as you type — green for correct, red for wrong.</li>
+    <li>Finish the command and move to the next one.</li>
+  </ol>
+
+  <h3>Scoring</h3>
+  <p>Your WPM (words per minute) and accuracy percentage are tracked per session. Aim to get accuracy above 95% before optimizing for speed.</p>
+
+  <div class="tip-box">
+    <strong>Tip:</strong> This tool is best used after you already know the commands — use Commands Puzzle to learn them first, then Command Recall to lock in the muscle memory.
+  </div>
+</div>
+
+<div class="section" id="subnet-methods">
+  <div class="section-label">Practice — 06</div>
+  <h2>Subnet Methods</h2>
+  <p class="section-tagline">Two dedicated drills for the two most important subnetting calculation methods on the CCNA exam.</p>
+
+  <p>When you open Subnet Methods you'll see a menu with two options. Pick one to begin.</p>
+
+  <div class="mode-grid">
+    <div class="mode-card">
+      <div class="mode-card-label">Method 1</div>
+      <div class="mode-card-name">Block Size</div>
+      <p>Given a random IP + prefix (/25–/30), you calculate the full subnet profile step by step.</p>
+    </div>
+    <div class="mode-card">
+      <div class="mode-card-label">Method 2</div>
+      <div class="mode-card-name">Powers of 2</div>
+      <p>Fill in the full 8-row 2ˢ / 2ʰ−2 table from memory, timed, with your best time saved.</p>
+    </div>
+  </div>
+
+  <h3>Block Size Drill — Step by Step</h3>
+  <p>Given an IP like <code>192.168.10.130/26</code>, you answer these six fields in order:</p>
+  <ol class="steps">
+    <li><strong>Block size</strong> — <code>256 − mask octet</code>. For /26 the mask octet is 192, so block size = 64.</li>
+    <li><strong>Network address</strong> — the start of the subnet block the IP falls in.</li>
+    <li><strong>First usable host</strong> — network address + 1.</li>
+    <li><strong>Last usable host</strong> — broadcast − 1.</li>
+    <li><strong>Broadcast address</strong> — last address in the block.</li>
+    <li><strong>Next network</strong> — network address + block size.</li>
+  </ol>
+  <p>Each answer is checked immediately. Wrong answers shake the input and let you retry — no attempt limit. Your total completion time is shown at the end.</p>
+
+  <h3>Powers of 2 Drill</h3>
+  <p>An 8-row table appears with two blank columns:</p>
+  <ul>
+    <li><strong>2ˢ</strong> — number of subnets created by borrowing that many bits</li>
+    <li><strong>2ʰ − 2</strong> — number of usable hosts when that many bits remain for hosts</li>
+  </ul>
+  <p>The timer starts on your first keystroke. Each cell turns green and locks when correct. Hover over any cell to see a formula hint (e.g. <em>2³</em> or <em>2³ − 2</em>). When all 16 cells are filled correctly, your time is recorded and compared to your personal best.</p>
+
+  <div class="key-box">
+    <strong>Goal:</strong> Get the Powers of 2 table under 30 seconds. At that point it's automatic and you can use it on any exam question without thinking.
+  </div>
+</div>
+
+<div class="section" id="commands-puzzle">
+  <div class="section-label">Practice — 07</div>
+  <h2>Commands Puzzle</h2>
+  <p class="section-tagline">Fill-in-the-blank IOS command construction. A scenario is given, one critical word is blanked out — type the missing word.</p>
+
+  <h3>How It Works</h3>
+  <ol class="steps">
+    <li>Select a section (or All Sections) from the category picker.</li>
+    <li>Read the scenario describing what the command does.</li>
+    <li>The command is shown with one key word replaced by <code>_______</code>.</li>
+    <li>Type the missing word and press <kbd>Enter</kbd> or click Submit.</li>
+    <li>You have 5 attempts before the answer is revealed.</li>
+  </ol>
+
+  <h3>Answer Reveal — CLI Sequence</h3>
+  <p>When the puzzle ends (correct or not), a terminal window appears showing the full command sequence an engineer would type on a real device — from User EXEC mode through all navigation steps to the final command. Navigation steps are dimmed; the answer is highlighted in green with a blinking cursor.</p>
+
+  <p>For example, a <code>config-if</code> mode command would show:</p>
+  <ul>
+    <li><code>Switch&gt; enable</code></li>
+    <li><code>Switch# configure terminal</code></li>
+    <li><code>Switch(config)# interface GigabitEthernet0/1</code></li>
+    <li><code>Switch(config-if)# <strong>switchport mode access</strong></code> ← your answer, highlighted</li>
+  </ul>
+
+  <h3>Skip &amp; Show Answer</h3>
+  <p>If you have no idea, click the <em>Skip &amp; Show Answer</em> link below the input. The answer is revealed immediately and the puzzle is re-queued — it will come back as your very next question so you get an immediate retry.</p>
+
+  <h3>Keyboard Shortcuts</h3>
+  <ul>
+    <li><kbd>Enter</kbd> — submit your answer</li>
+    <li><kbd>Enter</kbd> on result screen — go to next puzzle</li>
+  </ul>
+
+  <h3>Hint System</h3>
+  <p>After two wrong attempts, a hint appears automatically showing the first word(s) of the command and the total word count.</p>
+</div>
+
+<div class="section" id="octet-drill">
+  <div class="section-label">Practice — 08</div>
+  <h2>Octet Drill</h2>
+  <p class="section-tagline">Binary-to-decimal and decimal-to-binary conversion for individual octets, under time pressure.</p>
+
+  <p>The exam doesn't require you to convert full IPs from scratch, but you need to instantly recognize values like 128, 192, 224, 240, 248, 252 — the subnet mask octets. This drill builds that recognition.</p>
+
+  <h3>How It Works</h3>
+  <p>You're shown an octet value (decimal or binary) and asked to type the other form. A timer tracks each answer. Your streak and average response time are shown as you go.</p>
+
+  <div class="key-box">
+    <strong>Focus on:</strong> The 8 power-of-2 values (128, 64, 32, 16, 8, 4, 2, 1) and the 6 subnet mask values (128, 192, 224, 240, 248, 252). Those cover 90% of exam scenarios.
+  </div>
+</div>
+
+<div class="section" id="pow2-logic">
+  <div class="section-label">Practice — 09</div>
+  <h2>2ⁿ Logic</h2>
+  <p class="section-tagline">Quick-fire questions that test whether you can apply powers of 2 to real subnetting problems.</p>
+
+  <p>Where the Powers of 2 drill in Subnet Methods trains you to recall the table, 2ⁿ Logic trains you to <em>apply</em> it. Questions take the form of:</p>
+  <ul>
+    <li><em>"A /26 gives how many usable hosts?"</em></li>
+    <li><em>"You need at least 50 hosts per subnet — what is the minimum prefix length?"</em></li>
+    <li><em>"Borrowing 4 bits from a /24 gives how many subnets?"</em></li>
+  </ul>
+
+  <p>Single answer per question, immediate feedback, scored by session.</p>
+</div>
+
+<div class="section" id="div-method">
+  <div class="section-label">Practice — 10</div>
+  <h2>Division Method</h2>
+  <p class="section-tagline">Subnetting using the division / magic number approach — given a network and a requirement, find the right subnet.</p>
+
+  <p>The Division Method is an alternative to Block Size for finding subnet boundaries. Rather than working from 256 − mask octet, you divide the address space by the number of required subnets to find the block size directly.</p>
+
+  <p>Questions present a network address and a host/subnet requirement. You calculate and enter the subnet mask, block size, and the specific subnet a host IP belongs to.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  TOOLS                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="section" id="ios-ref">
+  <div class="section-label">Tools — 11</div>
+  <h2>IOS Command Ref</h2>
+  <p class="section-tagline">A searchable, filterable reference for every major Cisco IOS command covered on the CCNA exam.</p>
+
+  <h3>Search</h3>
+  <p>Type anything in the search bar — command name, keyword, concept, or tag (e.g. <em>"OSPF neighbor"</em>, <em>"trunk"</em>, <em>"show interface"</em>). Results update in real time across command names, syntax, descriptions, variations, output tips, and tags.</p>
+
+  <h3>Category Filters</h3>
+  <p>Use the filter bar to narrow results by category: Interfaces, Routing, OSPF, EIGRP, STP, VLANs, DHCP, NAT, Security, and more. You can combine search and filter.</p>
+
+  <h3>Command Cards</h3>
+  <p>Each card shows the command name, syntax, and a short description. Click any card to open the full detail modal, which includes:</p>
+  <ul>
+    <li>Full syntax with all forms</li>
+    <li>Complete description</li>
+    <li>Command variations (e.g. <code>show interfaces status</code> vs <code>show interfaces summary</code>)</li>
+    <li>Output tips — what to look for in the output</li>
+    <li>Study tip</li>
+    <li>Searchable tags</li>
+  </ul>
+
+  <div class="tip-box">
+    <strong>Tip:</strong> Use this as a reference after getting a question wrong in Flackbox or Commands Puzzle — look up the command to understand the full context, not just the answer.
+  </div>
+</div>
+
+<div class="section" id="subnet-calc">
+  <div class="section-label">Tools — 12</div>
+  <h2>Subnet Calculator</h2>
+  <p class="section-tagline">Enter any IPv4 address and prefix — get back the full subnet profile instantly.</p>
+
+  <h3>How to Use</h3>
+  <ol class="steps">
+    <li>Enter an IP address in dotted-decimal format (e.g. <code>192.168.10.130</code>).</li>
+    <li>Enter the prefix length (e.g. <code>/26</code>) or subnet mask.</li>
+    <li>Results display immediately: network address, broadcast, first/last usable host, block size, total and usable host count, and the next network.</li>
+  </ol>
+
+  <p>This is a reference tool — use it to verify your manual calculations from the Block Size or Division Method drills. Don't rely on it during study sessions; use it to check your work afterward.</p>
+</div>
+
+<div class="section" id="acl-builder">
+  <div class="section-label">Tools — 13</div>
+  <h2>ACL Builder</h2>
+  <p class="section-tagline">A visual tool for constructing and understanding IPv4 ACL statements.</p>
+
+  <h3>How to Use</h3>
+  <p>The ACL Builder walks you through each component of an ACL statement interactively:</p>
+  <ul>
+    <li><strong>ACL type</strong> — Standard (number 1–99) or Extended (100–199), or named</li>
+    <li><strong>Action</strong> — permit or deny</li>
+    <li><strong>Source / Destination</strong> — IP address with wildcard mask</li>
+    <li><strong>Protocol &amp; Port</strong> — for extended ACLs (TCP, UDP, ICMP, etc.)</li>
+  </ul>
+
+  <p>As you build the statement, the full IOS syntax is shown in real time. The explainer below it describes in plain English what the statement will do.</p>
+
+  <div class="key-box">
+    <strong>Wildcard Mask Reminder:</strong> Wildcard masks are the inverse of subnet masks. A /24 subnet mask of <code>255.255.255.0</code> has a wildcard of <code>0.0.0.255</code>. The ACL Builder will calculate this for you if you enter the prefix.
+  </div>
+</div>
+
+</body>
+</html>
